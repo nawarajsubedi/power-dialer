@@ -1,0 +1,430 @@
+input CampaignContactCSVInputData {
+  contactListName: String!
+  createdByName: String!
+  skipCsvUpload: Boolean!
+  isContactListHidden: Boolean!
+  file: Upload
+}
+
+input CampaignContactDetailCSVInputData {
+  contactListId: String!
+  file: Upload
+}
+
+enum CampaignContactListMastActionType {
+  Rename
+  Archive
+}
+
+type UploadCampaignContactData {
+  totalContactCount: Int
+}
+
+type UploadCampaignContactPayload {
+  status: Int!
+  error: ErrorData
+  data: UploadCampaignContactData
+}
+
+type CampaignContactLists {
+  id: ShortId
+  name: String
+  createdOn: Datetime
+  createdBy: String
+  contactCount: Int
+  campaigns: [String]
+}
+
+type CampaignsListNode {
+  id: ShortId
+  workspaceId: ShortId
+  campaignName: String
+  assigneName: String
+  assigneId: ShortId
+  dialingNumber: String
+  dialingNumberId: ShortId
+  callingDatacenter: String
+  callRecordingEnabled: Boolean
+  voicemailEnabled: Boolean
+  voicemailId: ShortId
+  cooloffPeriodEnabled: Boolean
+  isContactListHidden: Boolean
+  coolOffPeriod: Int
+  callAttemptsEnabled: Boolean
+  callAttemptsCount: Int
+  callAttemptsGap: Int
+  callScriptEnabled: Boolean
+  isArchived: Boolean
+  callScriptId: ShortId
+  contactListId: ShortId
+  nextNumberToDial: String
+  campaignStatus: String
+  contactCount: Int
+  createdOn: Datetime
+  createdBy: String
+  contactListName: String
+}
+
+type WorkspaceCampaignContactListPayload {
+  status: Int!
+  error: ErrorData
+  data: [CampaignContactLists]
+}
+
+type CampaignsListEdges implements Edge {
+  cursor: Cursor!
+  node: CampaignsListNode
+}
+
+type CampaignsListData {
+  pageInfo: PageInfo!
+  edges: [CampaignsListEdges]
+
+}
+
+type WorkspaceCampaignsPayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignsListData
+}
+
+input UpdateCampaignContactListInputData {
+  contactListId: ShortId!
+  action: CampaignContactListMastActionType!
+  name: String
+  archiveContactList: Boolean
+}
+
+type UpdateCampaignContactListResponse {
+  id: ShortId!
+  name: String!
+}
+
+type UpdateCampaignContactListPayload {
+  status: Int!
+  error: ErrorData
+  data: UpdateCampaignContactListResponse
+}
+
+type CampaignContactDetailLists {
+  id: ShortId
+  name: String
+  number: String
+  createdOn: Datetime
+}
+
+type WorkspaceCampaignContactDetailsPayload {
+  status: Int!
+  error: ErrorData
+  data: [CampaignContactDetailLists]
+}
+
+input AddCampaignContactDetailInputData {
+  id: ShortId!
+  name: String!
+  number: String!
+}
+
+type AddCampaignContactDetailtData {
+  id: ShortId!
+  name: String!
+  number: String!
+}
+
+type AddCampaignContactDetailPayload {
+  status: Int!
+  error: ErrorData
+  data: AddCampaignContactDetailtData
+}
+
+input DeleteCampaignContactDetailInputData {
+  contacts: [ShortId]
+  contactListId: ShortId!
+}
+
+type DeleteCampaignContactDetailData {
+  success: Boolean!
+}
+
+type DeleteCampaignContactDetailPayload {
+  status: Int!
+  error: ErrorData
+  data: DeleteCampaignContactDetailData
+}
+
+enum RecordingTypes {
+  TTS
+  Custom
+}
+
+input CampaignVoiceMailDropInputData {
+  file: Upload
+  source: String
+  voice: String
+  accent: String
+  recordingType: RecordingTypes!
+  name: String!
+  createdByName: String!
+}
+
+type CampaignVoiceMailPayloadData {
+  success: Boolean!
+}
+
+type CampaignVoiceMailDropPayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignVoiceMailPayloadData
+}
+
+type CampaignVoiceMailListData {
+  id: ShortId
+  ttsSource: String
+  ttsVoice: String
+  ttsAccent: String
+  recordingType: RecordingTypes
+  name: String
+  isDefault: Boolean
+  recordingUrl: String
+  createdOn: Datetime
+  createdBy: String
+}
+
+type CampaignVoicemailListPayload {
+  status: Int!
+  error: ErrorData
+  data: [CampaignVoiceMailListData]
+}
+
+enum UpdateCampaignVoicemailActionType {
+  Rename
+  Delete
+  Makedefault
+}
+
+enum UpdateCallScriptActionType {
+  Update
+  Delete
+  Makedefault
+}
+
+input UpdateCampaignVoiceMailInputData {
+  id: ShortId!
+  action: UpdateCampaignVoicemailActionType!
+  renameText: String
+}
+
+type UpdateCampaignVoicemailData {
+  success: Boolean!
+}
+
+type UpdateCampaignVoicemailPayload {
+  status: Int!
+  error: ErrorData
+  data: UpdateCampaignVoicemailData
+}
+
+input CampaignCallScriptInputData {
+  scriptTitle: String!
+  description: String!
+  createdByName: String!
+}
+
+type CampaignCallScriptPayloadData {
+  success: Boolean!
+}
+
+type CampaignCallScriptPayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignCallScriptPayloadData
+}
+
+input UpdateCallScriptInputData {
+  id: ShortId!
+  action: UpdateCallScriptActionType!
+  scriptTitle: String!
+  description: String!
+}
+
+type UpdateCampaignCallScriptData {
+  success: Boolean!
+}
+
+type UpdateCampaignCallScriptPayload {
+  status: Int!
+  error: ErrorData
+  data: UpdateCampaignCallScriptData
+}
+
+type CampaignCallScriptListData {
+  id: ShortId
+  scriptTitle: String
+  description: String
+  isDefault: Boolean
+  createdOn: Datetime
+  createdBy: String
+}
+
+type CampaignCallScriptListPayload {
+  status: Int!
+  error: ErrorData
+  data: [CampaignCallScriptListData]
+}
+
+type CampaignCallScriptByIdPayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignCallScriptListData
+}
+
+type CampaignCallScriptAttributeListData {
+  name: String
+  description: String
+}
+
+type CampaignCallScriptAttributeListPayload {
+  status: Int!
+  error: ErrorData
+  data: [CampaignCallScriptAttributeListData]
+}
+
+input CreateCampaignsInputData {
+  campaignName: String!
+  skipCsvUpload: Boolean!
+  isContactListHidden: Boolean
+  contactListId: ShortId
+  file: Upload
+  assigneeId: ShortId!
+  assigneeName: String!
+  dialingNumberId: ShortId!
+  createdByName: String!
+  dialingNumber: String!
+  dataCenter: String!
+  isCallRecordingEnabled: Boolean!
+  isVoicemailEnabled: Boolean
+  voiceMailId: ShortId
+  isCoolOffPeriodEnabled: Boolean!
+  coolOffPeriod: Int
+  isAttemptsPerCallEnabled: Boolean!
+  callAttemptCount: Int
+  callAttemptGap: Int
+  isCallScriptEnabled: Boolean!
+  callScriptId: ShortId
+}
+
+input CampaignCallNoteInputData {
+  callNote: String
+  campaignId: ShortId!
+  campaignConversationId: ShortId!
+}
+
+input CampaignCallNoteUpdateInputData {
+  callNote: String
+  id: ShortId!
+}
+
+type CampaignNotePayloadData {
+  id: ShortId
+  note: String
+}
+
+type CampaignCallNotePayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignNotePayloadData
+}
+
+type CreateCampaignData {
+  success: Boolean
+}
+
+type CreateCampaignPayload {
+  status: Int!
+  error: ErrorData
+  data: CreateCampaignData
+}
+
+input UpdateCampaignsInputData {
+  id: ShortId!
+  campaignName: String!
+  skipCsvUpload: Boolean!
+  isContactListHidden: Boolean!
+  contactListId: ShortId
+  file: Upload
+  assigneeId: ShortId!
+  dialingNumberId: ShortId!
+  assigneeName: String!
+  dialingNumber: String!
+  dataCenter: String!
+  isCallRecordingEnabled: Boolean!
+  isVoicemailEnabled: Boolean!
+  voiceMailId: ShortId
+  isCoolOffPeriodEnabled: Boolean!
+  coolOffPeriod: Int
+  isAttemptsPerCallEnabled: Boolean!
+  callAttemptCount: Int
+  callAttemptGap: Int
+  isCallScriptEnabled: Boolean!
+  callScriptId: ShortId
+  createdByName: String!
+}
+
+input ArchiveCampaignsInputData {
+  id: ShortId!
+  isArchived: Boolean!
+}
+
+type ArchiveCampaignData {
+  success: Boolean!
+}
+
+type ArchiveCampaignPayload {
+  status: Int!
+  error: ErrorData
+  data: ArchiveCampaignData
+}
+
+type UpdateCampaignData {
+  success: Boolean!
+}
+
+type UpdateCampaignPayload {
+  status: Int!
+  error: ErrorData
+  data: UpdateCampaignData
+}
+
+#enum CampaignStatus {
+#  ACTIVE
+#  ARCHIVED
+#  COMPLETED
+#  ENDED
+#  PAUSED
+#  INPROGRESS
+#}
+
+input CampaignListCursor {
+  first: Int
+  last: Int
+  before: Cursor
+  beforeWith: Cursor
+  after: Cursor
+  afterWith: Cursor
+  filter: FilterParams
+  search: SearchParams
+}
+
+type CampaignsCountData {
+  archived: Int
+  active: Int
+
+}
+
+type CampaignsCountPayload {
+  status: Int!
+  error: ErrorData
+  data: CampaignsCountData
+}
+
+

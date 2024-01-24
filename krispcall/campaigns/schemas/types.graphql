@@ -1,0 +1,305 @@
+scalar Upload
+scalar Datetime
+scalar ShortId
+scalar Cursor
+scalar FilterParams
+
+type ErrorData {
+code: Int!
+message: String!
+errorKey: String
+}
+
+type ResourceSucceedPayload {
+status: Int!
+error: ErrorData
+data: ResourceSucceedPayloadData
+}
+
+type ResourceSucceedPayloadData {
+success: Boolean!
+}
+
+input DeleteUserDataInput{
+authId: ShortId!
+}
+
+enum CampaignAction {
+START
+RESUME
+PAUSE
+END
+REATTEMPT
+}
+
+enum CampaignConversationType {
+INITIAL
+REATTEMPT
+}
+
+input CampaignAnalyticsInput {
+campaignId: ShortId
+conversationType: CampaignConversationType
+}
+
+input CampaignStatsInput {
+campaignId: ShortId
+}
+
+type ConversationNote {
+noteId: ShortId!
+note: String
+
+}
+type CampaignConversationNode {
+id: ShortId!
+status: String!
+contactName: String
+contactNumber: String
+callDuration: String
+recordingUrl: String
+recordingDuration: String
+callStartTime: String
+sequenceNumber: String
+conversationNote: ShortId
+reasonMessage: String
+}
+
+type CampaignAnalyticsPayloadData {
+pageInfo: PageInfo!
+edges: [CampaignConversationEdge]
+}
+
+type CampaignAnalyticsPayload {
+status: Int!
+error: ErrorData
+data: CampaignAnalyticsPayloadData
+}
+
+type CampaignStatisticsPayloadData {
+campaignId: ShortId
+totalContacts: Int
+dialedContacts: Int
+voicemailDrops: Int
+answeredCalls: Int
+unansweredCalls: Int
+activeCallDuration: Int
+campaignDuration: Int
+}
+
+type CampaignStatsPayload {
+status: Int!
+error: ErrorData
+data: CampaignStatisticsPayloadData
+}
+
+input SkipCampaignConversationInput {
+conversationSid: ShortId!
+campaignId: ShortId!
+}
+
+type NextConversation {
+nextId: ShortId
+contactNumber: String
+}
+
+type SkipCampaignConversationPayload {
+  status: Int!
+  error: ErrorData
+  data: NextConversation
+}
+
+input ControlCampaignInput {
+id: ShortId!
+action: CampaignAction!
+}
+
+enum CampaignStatus {
+INPROGRESS
+PAUSED
+ENDED
+COMPLETED
+ACTIVE
+}
+
+type ControlCampaignPayloadData{
+id: ShortId!
+status: CampaignStatus!
+}
+type ControlCampaignPayload {
+status: Int!
+error: ErrorData
+data: ControlCampaignPayloadData
+}
+
+input HoldCampaignConversationInput {
+conversationSid: ShortId!
+hold: Boolean!
+}
+
+enum CampaignConversationRecordAction {
+PAUSE
+RESUME
+STOP
+}
+
+enum CampaignConversationRecordState {
+PAUSED
+INPROGRESS
+STOPPED
+}
+
+input CampaignConversationRecordInput {
+conversationSid: ShortId!
+action: CampaignConversationRecordAction!
+}
+
+type CampaignConversationRecordPayloadData {
+conversationSid: ShortId!
+status: CampaignConversationRecordState
+}
+
+type CampaignConversationRecordPayload {
+status: Int!
+error: ErrorData
+data: CampaignConversationRecordPayloadData
+}
+
+type HoldCampaignConversationPayloadData {
+conversationSid: ShortId!
+onHold: Boolean!
+}
+
+type HoldCampaignConversationPayload {
+status: Int!
+error: ErrorData
+data: HoldCampaignConversationPayloadData
+}
+
+interface Edge {
+cursor: Cursor!
+}
+
+type CampaignConversationEdge implements Edge {
+cursor: Cursor!
+node: CampaignConversationNode
+
+}
+
+type PageInfo {
+startCursor: Cursor
+endCursor: Cursor
+hasNextPage: Boolean
+hasPreviousPage: Boolean
+totalCount: Int
+}
+
+input CampaignAnalyticsCursor {
+first: Int
+last: Int
+before: Cursor
+beforeWith: Cursor
+after: Cursor
+afterWith: Cursor
+}
+
+input SearchParams {
+columns: [String]
+value: String
+}
+
+input CampaignNoteInput {
+noteId: ShortId
+}
+input CampaignVoicemailInput {
+voicemailId: ShortId
+
+}
+input CampaignCallScriptInput {
+callscriptId: ShortId
+
+}
+type CampaignConversationNotePayloadData {
+id: ShortId!
+callNote: String
+createdAt: Datetime
+}
+
+type CampaignNotePayload {
+status: Int!
+error: ErrorData
+data: CampaignConversationNotePayloadData
+}
+
+input CampaignDetailsInput {
+id: ShortId!
+}
+
+type CampaignDetailsPayloadData {
+id: ShortId
+workspaceId: ShortId
+createdByName: String
+campaignName: String
+assigneeName: String
+assigneeId: ShortId
+dialingNumber: String
+dialingNumberId: ShortId
+campaignStatus: String
+callRecordingEnabled: Boolean
+voicemailEnabled: Boolean
+callScriptEnabled: Boolean
+voicemailId: ShortId
+callScriptId: ShortId
+coolOffPeriodEnabled: Boolean
+callingDatacenter: String
+isArchived: Boolean
+createdOn: Datetime
+contactCount: Int
+}
+
+type CampaignDetailsPayload {
+status: Int!
+error: ErrorData
+data: CampaignDetailsPayloadData
+}
+
+input VoicemailDropInput {
+conversationId: ShortId!
+campaignId: ShortId!
+}
+type VoicemailDropPayloadData {
+conversationId: ShortId!
+status: String
+}
+
+type VoicemailDropPayload {
+status: Int!
+error: ErrorData
+data: VoicemailDropPayloadData
+}
+
+type CallScriptPayloadData {
+  id: ShortId
+  scriptTitle: String
+  description: String
+}
+
+type CallScriptPayload {
+  status: Int!
+  error: ErrorData
+  data: CallScriptPayloadData
+}
+
+type VoicemailPayloadData {
+  id: ShortId
+  name: String
+  recordingType: String
+  recordingUrl: String
+
+}
+
+type CampaignVoicemailPayload {
+  status: Int!
+  error: ErrorData
+  data: VoicemailPayloadData
+}
