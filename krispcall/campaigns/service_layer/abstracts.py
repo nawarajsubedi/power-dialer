@@ -7,16 +7,17 @@ from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, Field, root_validator
 
-from krispcall.core.abstracts.shortid import ShortId
-from krispcall.web.jsonapi.abstracts import (
+from krispcall.common.abstracts import (
     DataModel,
     ResourceModel,
     QueryModel,
     with_response,
 )
 
-from krispcall.web.constants import HTTP_SUCCESS_OK
+from krispcall.common.http_status_code import HTTP_200_OK
 from pydantic import validator
+
+from krispcall.common.shortid import ShortId
 
 
 class CampaignContactListMastData(ResourceModel):
@@ -104,7 +105,7 @@ def get_campaign_contact_list(response_factory, *, resource):
                 }
             )
     contactList = [CampaignContactListMastData.construct(**c) for c in data]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": contactList}
+    return {"status": HTTP_200_OK, "error": None, "data": contactList}
 
 
 @with_response(CampaignContactListDetailData)
@@ -120,7 +121,7 @@ def get_campaign_contact_dtl_list(response_factory, *, resource):
             }
         )
     contactList = [CampaignContactListDetailData.construct(**c) for c in data]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": contactList}
+    return {"status": HTTP_200_OK, "error": None, "data": contactList}
 
 
 class UpdateCampaignContactList(DataModel):
@@ -149,7 +150,7 @@ def campaign_contact_list_update(response_factory, *, resource):
             name=resource.name,
         ),
         meta=None,
-        status=HTTP_SUCCESS_OK,
+        status=HTTP_200_OK,
     )
 
 
@@ -162,7 +163,7 @@ def campaign_add_contact_detail(response_factory, *, resource):
             number=resource.contact_number,
         ),
         meta=None,
-        status=HTTP_SUCCESS_OK,
+        status=HTTP_200_OK,
     )
 
 
@@ -202,7 +203,7 @@ def get_campaign_voicemails(response_factory, *, resource):
             }
         )
     voicemailList = [CampaignVoicemailListData.construct(**c) for c in data]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": voicemailList}
+    return {"status": HTTP_200_OK, "error": None, "data": voicemailList}
 
 
 @with_response(CampaignListData)
@@ -243,7 +244,7 @@ def get_campaign(response_factory, *, resource):
             }
         )
     campaignList = [CampaignListData.construct(**c) for c in data]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": campaignList}
+    return {"status": HTTP_200_OK, "error": None, "data": campaignList}
 
 
 class AddCallScripts(DataModel):
@@ -285,7 +286,7 @@ def get_campaign_callScripts(response_factory, *, resource):
             }
         )
     callScripts = [CampaignCallScriptsListData.construct(**c) for c in data]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": callScripts}
+    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
 
 
 @with_response(CampaignCallScriptsListData)
@@ -298,7 +299,7 @@ def get_callScript_by_id(response_factory, *, record):
         "created_on": record.get("created_on"),
         "created_by": record.get("created_by_name"),
     }
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": callScripts}
+    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
 
 
 @with_response(CampaignCallScriptsAtributeListData)
@@ -315,7 +316,7 @@ def get_campaign_callScripts_attributes(response_factory, *, resource):
     callScripts = [
         CampaignCallScriptsAtributeListData.construct(**c) for c in data
     ]
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": callScripts}
+    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
 
 
 class CreateCampaign(DataModel):
@@ -511,7 +512,7 @@ class CampaignAnalyticsData(ResourceModel):
 @with_response(CampaignAnalyticsData)
 def get_campaign_analytics(response_factory, *, resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": [
             {
@@ -567,7 +568,7 @@ def get_campaign_stats(response_factory, *, resource):
         }
     )
 
-    return {"status": HTTP_SUCCESS_OK, "error": None, "data": data}
+    return {"status": HTTP_200_OK, "error": None, "data": data}
 
 
 class CampaignNote(ResourceModel):
@@ -579,7 +580,7 @@ class CampaignNote(ResourceModel):
 @with_response(CampaignNote)
 def get_campaign_note(response_factory, *, resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": {
             "call_note": resource.get("call_note"),
@@ -591,7 +592,7 @@ def get_campaign_note(response_factory, *, resource):
 
 def get_campaign_callscript(resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": {
             "id": resource.get("id"),
@@ -603,7 +604,7 @@ def get_campaign_callscript(resource):
 
 def get_campaign_voicemail(resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": {
             "id": resource.get("id"),
@@ -639,7 +640,7 @@ class CampaignDetails(ResourceModel):
 @with_response(CampaignDetails)
 def get_campaign_details(response_factory, *, resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": resource,
     }
@@ -653,7 +654,7 @@ class VoicemailDropResource(ResourceModel):
 @with_response(VoicemailDropResource)
 def get_voicemail_drop(response_factory, *, resource):
     return {
-        "status": HTTP_SUCCESS_OK,
+        "status": HTTP_200_OK,
         "error": None,
         "data": {
             "conversation_id": resource.get("conversation_id"),

@@ -32,7 +32,7 @@ async def get_workspace_feature(workspace_id: ShortId, feature_name: str):
         stub = stubs.foundation.FoundationRPCStub(channel)
         try:
             workspace_feature = stub.GetWorkspaceFeature(
-                descriptors.foundation.GetWorkgespaceFeatureRequest(
+                descriptors.foundation.GetWorkgespaceFeatureRequest( # type: ignore
                     workspace_id=workspace_id, feature_name=feature_name
                 )
             )
@@ -42,6 +42,6 @@ async def get_workspace_feature(workspace_id: ShortId, feature_name: str):
                 including_default_value_fields=True,
             )
         except grpc.RpcError as e:
-            if e.code() == grpc.StatusCode.NOT_FOUND:
+            if e.code() == grpc.StatusCode.NOT_FOUND: # type: ignore
                 return None
             raise e

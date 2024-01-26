@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from uuid import UUID
 from krispcall.campaigns.service_layer.abstracts import CampPaginationParams
-from krispcall.common.service_layer.abstracts import PaginationParams
-from krispcall.common.service_layer.pagination import CursorPagination
+from krispcall.common.services.pagination import PaginationParams
+from krispcall.common.services.pagination import CursorPagination
 import sqlalchemy as sa
-from krispcall.core.protocols.database import DbConnection
+from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.adapters import orm
 
 

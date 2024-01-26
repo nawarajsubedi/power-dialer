@@ -1,8 +1,11 @@
+import asyncio
 from functools import wraps
+from krispcall.auth.constant import TOKEN_EXPIRED
 from krispcall.common.shortid import ShortId
-from krispcall.common import http_status_code
+from krispcall.common.services import status as HTTP_STATUS_CODE
 
-from typing import Any, Callable
+from starlette.authentication import has_required_scope
+from typing import Any, Callable, List
 from krispcall.auth.enums import AuthFeatureEnum
 from krispcall.common.responses import create_error_response
 from krispcall.common.translator import get_translator
@@ -36,3 +39,48 @@ def requires_power_dialer_enabled(func: Callable):
         )
 
     return wrapper
+
+
+def required_scope(scope: List[str]) -> Callable:
+    """checks permission and return forbidden response if required"""
+
+    def actual_wrapper(func: Callable):
+        if asyncio.iscoroutinefunction(func):
+
+            @wraps(func)
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+                _, info = args
+                if has_required_scope(info.context["request"], TOKEN_EXPIRED):
+                    # raise AuthenticationError(
+                    #     "Token Expired"
+                    # )
+                    return create_error_response(
+                        message="Token Expired",
+                        error_status=HTTP_STATUS_CODE.HTTP_401_TOKEN_EXPIRED,
+                    )
+                if not has_required_scope(info.context["request"], scope):
+                    return create_error_response(
+                        message="Invalid auth credentials",
+                        error_status=HTTP_STATUS_CODE.HTTP_401_UNAUTHORIZED,
+                    )
+                return await func(*args, **kwargs)
+
+            return async_wrapper
+
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            _, info = args
+            if has_required_scope(info.context["request"], TOKEN_EXPIRED):
+                return create_error_response(
+                    message="Token Expired",
+                    error_status=HTTP_STATUS_CODE.HTTP_401_TOKEN_EXPIRED,
+                )
+            if not has_required_scope(info.context["request"], scope):
+                return create_error_response(
+                    message="Invalid auth credentials",
+                    error_status=HTTP_STATUS_CODE.HTTP_401_UNAUTHORIZED,
+                )
+            return func(*args, **kwargs)
+
+    return actual_wrapper
+

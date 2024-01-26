@@ -1,0 +1,6 @@
+CHARGE_CALL_BACK_TIME = 55
+CHARGE_START_CALL_TIME = 50
+
+
+# Threshold call price per minute
+THRESHOLD_CALL_PER_MINUTE = 0.5

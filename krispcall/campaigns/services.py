@@ -7,16 +7,16 @@ from krispcall.campaigns.service_layer.exceptions import (
     CampaignAlreadyEnded,
     CampaignAlreadyPaused,
 )
-from krispcall.common.core.bootstrap import JobQueue
-from krispcall.common.core.settings import Settings
+from krispcall.providers.queue_service.job_queue import JobQueue
+from krispcall.common.app_settings import Settings
 from krispcall.konference.domain.models import CampaignConversation
 from loguru import logger
 from starlette.requests import Request
 from datetime import date, datetime
 from typing import Dict, List, Union
 from uuid import UUID, uuid4
-from krispcall.core.abstracts.shortid import ShortId
-from krispcall.core.protocols.database import DbConnection
+from krispcall.common.shortid import ShortId
+from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.domain import commands, models
 from krispcall.campaigns.service_layer import (
     abstracts,
@@ -27,7 +27,7 @@ from krispcall.campaigns.service_layer import (
 )
 from krispcall.konference import services as konference_services
 from krispcall.konference.service_layer import views as konference_views
-from krispcall_twilio import TwilioClient
+from krispcall.twilio.utils import TwilioClient
 from krispcall.campaigns.service_layer import helpers
 import copy
 
@@ -46,7 +46,7 @@ async def upload_campaign_contact_list(
     skip_csv_upload: bool,
     db_conn: DbConnection,
     job_queue,
-) -> models.Client:
+) -> models.Client: # type: ignore
     async with unit_of_work.CampaignContactSqlUnitOfWork(db_conn) as uow:
         contact_mast_data = handlers.add_contact_list_master(
             commands.CampaignContactMastData(
@@ -65,7 +65,7 @@ async def upload_campaign_contact_list(
 
         if not skip_csv_upload:
             contact_list = []
-            for each in contact_data:
+            for each in contact_data: # type: ignore
                 today = str(date.today())
                 name = each.get("Contact Name", f"import_{today}")
                 phone_number = each.get("Phone Number", "")
@@ -92,7 +92,7 @@ async def upload_contact_detail_csv(
     total_records: int,
     contact_data: Dict,
     db_conn: DbConnection,
-) -> models.Client:
+) -> models.Client: # type: ignore
     async with unit_of_work.CampaignContactSqlUnitOfWork(db_conn) as uow:
         contact_mast = await uow.repository.get(contact_list_id)
         contact_list = []
@@ -393,7 +393,7 @@ async def create_campaign(
     next_number_to_dial: str,
     validated_data: abstracts.CreateCampaign,
     callable_data: Union[List[Dict], None],
-) -> models.Client:
+) -> models.Client: # type: ignore
     cmd = commands.AddCampaigns(
         workspace_id=workspace_id,
         campaign_name=validated_data.campaign_name,
@@ -409,7 +409,7 @@ async def create_campaign(
         voicemail_enabled=validated_data.is_voicemail_enabled,
         voicemail_id=None
         if not validated_data.is_voicemail_enabled
-        else ShortId(validated_data.voice_mail_id).uuid(),
+        else ShortId(validated_data.voice_mail_id).uuid(), # type: ignore
         cooloff_period_enabled=validated_data.is_cool_off_period_enabled,
         cool_off_period=validated_data.cool_off_period,
         call_attempts_enabled=validated_data.is_attempts_per_call_enabled,
@@ -418,7 +418,7 @@ async def create_campaign(
         call_script_enabled=validated_data.is_call_script_enabled,
         call_script_id=None
         if not validated_data.is_call_script_enabled
-        else ShortId(validated_data.call_script_id).uuid(),
+        else ShortId(validated_data.call_script_id).uuid(), # type: ignore
         contact_list_id=contact_list_id,
         next_number_to_dial=next_number_to_dial,
         callable_data=helpers.build_callable_list(callable_data),
@@ -532,7 +532,7 @@ async def record_campaign_conversation(
 ):
     return await konference_services.record_campaign_conversation(
         conversation_sid=conversation_sid,
-        action=action.value.lower(),
+        action=action.value.lower(), # type: ignore
         db_conn=db_conn,
         twilio_client_=twilio_client_,
         workspace=workspace,
@@ -567,7 +567,7 @@ async def skip_campaign_conversation(
         return
     next_number = next_in_sequence.get("contact_number")
     await update_next_number_to_dial(
-        campaign_id=campaign_id, next_number=next_number, db_conn=db_conn
+        campaign_id=campaign_id, next_number=next_number, db_conn=db_conn # type: ignore
     )
     return next_in_sequence
 
@@ -631,7 +631,8 @@ async def control_campaign(
             and campaign.campaign_status == "inprogress"
         ):
             raise CampaignAlreadyActive("Campaign is already active.")
-        created_by = campaign.created_by
+        # Note Nawaraj need to verify
+        created_by = campaign.created_by_name # type: ignore
         campaign_ = handlers.control_campaign(
             commands.ControlCampaignCommand(
                 campaign=campaign,
