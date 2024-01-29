@@ -4,7 +4,7 @@ from uuid import UUID
 from krispcall.campaigns import services
 from redis import Redis
 
-from krispcall.core.abstracts.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 
 async def update_next_number_to_dial(

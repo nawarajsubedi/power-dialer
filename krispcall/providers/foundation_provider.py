@@ -2,7 +2,7 @@ import os
 import grpc
 from google.protobuf.json_format import MessageToDict
 
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.providers.grpc import descriptors, stubs
 
 BILLING_RPC_LOCAL_ADDRESS = "[::]:8005"
@@ -32,7 +32,7 @@ async def get_workspace_feature(workspace_id: ShortId, feature_name: str):
         stub = stubs.foundation.FoundationRPCStub(channel)
         try:
             workspace_feature = stub.GetWorkspaceFeature(
-                descriptors.foundation.GetWorkgespaceFeatureRequest( # type: ignore
+                descriptors.foundation.GetWorkspaceFeatureRequest(
                     workspace_id=workspace_id, feature_name=feature_name
                 )
             )

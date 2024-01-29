@@ -1,5 +1,5 @@
 from krispcall.konference.billing import constant as BillingConstant
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 from krispcall.konference.billing.models import (
     BillingResponse,

@@ -3,7 +3,7 @@ import typing
 from uuid import UUID, uuid4
 from enum import Enum, unique
 
-from krispcall.common.models.models import BaseEntity
+from krispcall.common.domain.entities import BaseEntity
 
 WorkspaceReference = typing.NewType("WorkspaceReference", UUID)
 PhoneNumber = typing.NewType("PhoneNumber", str)

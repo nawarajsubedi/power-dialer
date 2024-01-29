@@ -1,27 +1,24 @@
-from typing import (
-    Any,
-    Dict,
+from typing import Any, Dict
+from krispcall.auth.constant import AUTHENTICATED_ACCESS_USER
+
+from krispcall.auth.requires_auth_power_dialer import (
+    required_scope,
+    requires_power_dialer_enabled,
 )
-from uuid import UUID
-from graphql.type.definition import GraphQLResolveInfo
 from ariadne import convert_kwargs_to_snake_case
+from graphql.type.definition import GraphQLResolveInfo
+from krispcall.common.responses.response_model import PaginationParams
+from krispcall.common.responses.responses import create_error_response
+
+from krispcall.common.utils.shortid import ShortId
+from krispcall.common.app_settings.request_helpers import get_database
+
+
+from krispcall.common.services import status as status
 from krispcall.auth.requires_auth_power_dialer import (
     requires_power_dialer_enabled,
 )
-from krispcall.web.helpers import get_database
-from krispcall.common.service_layer.auth import (
-    AUTHENTICATED_ACCESS_USER,
-)
-from krispcall.common.entrypoints.graphql.helpers import (
-    required_scope,
-)
-from krispcall.core.abstracts.shortid import ShortId
-from krispcall.common.service_layer.abstracts import (
-    PaginationParams,
-    create_error_response,
-)
-from krispcall.campaigns.service_layer import views, abstracts
-from krispcall.common.service_layer import status
+from krispcall.campaigns.service_layer import abstracts, views
 from krispcall.konference.service_layer import views as konference_views
 
 

@@ -6,18 +6,20 @@ from typing import Any, List, Optional, Union, Literal
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, Field, root_validator
+from krispcall.common.responses.response_model import create_success_response
+from krispcall.common.services.pagination.query import QueryModel
+from krispcall.common.services.status import HTTP_200_OK
 
-from krispcall.common.abstracts import (
+from krispcall.common.with_response import (
     DataModel,
     ResourceModel,
-    QueryModel,
+    # QueryModel,
     with_response,
 )
 
-from krispcall.common.http_status_code import HTTP_200_OK
 from pydantic import validator
 
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 
 class CampaignContactListMastData(ResourceModel):
@@ -105,7 +107,7 @@ def get_campaign_contact_list(response_factory, *, resource):
                 }
             )
     contactList = [CampaignContactListMastData.construct(**c) for c in data]
-    return {"status": HTTP_200_OK, "error": None, "data": contactList}
+    return create_success_response(data=contactList)
 
 
 @with_response(CampaignContactListDetailData)
@@ -121,7 +123,7 @@ def get_campaign_contact_dtl_list(response_factory, *, resource):
             }
         )
     contactList = [CampaignContactListDetailData.construct(**c) for c in data]
-    return {"status": HTTP_200_OK, "error": None, "data": contactList}
+    return create_success_response(data=contactList)
 
 
 class UpdateCampaignContactList(DataModel):
@@ -202,8 +204,8 @@ def get_campaign_voicemails(response_factory, *, resource):
                 "created_by": record["created_by_name"],
             }
         )
-    voicemailList = [CampaignVoicemailListData.construct(**c) for c in data]
-    return {"status": HTTP_200_OK, "error": None, "data": voicemailList}
+    voicemail_list = [CampaignVoicemailListData.construct(**c) for c in data]
+    return create_success_response(data=voicemail_list)
 
 
 @with_response(CampaignListData)
@@ -243,9 +245,8 @@ def get_campaign(response_factory, *, resource):
                 "contact_list_name": record["name"],
             }
         )
-    campaignList = [CampaignListData.construct(**c) for c in data]
-    return {"status": HTTP_200_OK, "error": None, "data": campaignList}
-
+    campaign_list = [CampaignListData.construct(**c) for c in data]
+    return create_success_response(data=campaign_list)
 
 class AddCallScripts(DataModel):
     created_by_name: str
@@ -285,13 +286,13 @@ def get_campaign_callScripts(response_factory, *, resource):
                 "created_by": record["created_by_name"],
             }
         )
-    callScripts = [CampaignCallScriptsListData.construct(**c) for c in data]
-    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
+    call_scripts = [CampaignCallScriptsListData.construct(**c) for c in data]
+    return create_success_response(data=call_scripts)
 
 
 @with_response(CampaignCallScriptsListData)
 def get_callScript_by_id(response_factory, *, record):
-    callScripts = {
+    call_scripts = {
         "id": record.get("id"),
         "script_title": record.get("script_title"),
         "description": record.get("description"),
@@ -299,7 +300,7 @@ def get_callScript_by_id(response_factory, *, record):
         "created_on": record.get("created_on"),
         "created_by": record.get("created_by_name"),
     }
-    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
+    return create_success_response(data=call_scripts)
 
 
 @with_response(CampaignCallScriptsAtributeListData)
@@ -313,10 +314,10 @@ def get_campaign_callScripts_attributes(response_factory, *, resource):
                 "description": record["description"],
             }
         )
-    callScripts = [
+    call_scripts = [
         CampaignCallScriptsAtributeListData.construct(**c) for c in data
     ]
-    return {"status": HTTP_200_OK, "error": None, "data": callScripts}
+    return create_success_response(data=call_scripts)
 
 
 class CreateCampaign(DataModel):

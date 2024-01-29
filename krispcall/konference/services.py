@@ -1,7 +1,7 @@
 import copy
 import json
 import typing
-from krispcall.common.static_helpers import url_safe_encode
+from krispcall.common.utils.static_helpers import url_safe_encode
 from krispcall.konference.billing.constant import CHARGE_START_CALL_TIME
 from redis import Redis
 from uuid import UUID, uuid4
@@ -13,13 +13,13 @@ from krispcall.konference.billing.billing_task_queue import (
     process_billing_transaction,
 )
 
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 from krispcall.twilio.errorHelper import handle_call_failed
 from krispcall.twilio.eventHandler import TwilioEventHandler
 from krispcall.common.database.connection import DbConnection
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings import Settings
+from krispcall.common.app_settings.app_settings import Settings
 from krispcall.konference.service_layer.abstracts import (
     TwilioPSTNCallback,
     TwilioAgentCallback,
@@ -40,7 +40,7 @@ from krispcall.campaigns.service_layer import views as campaign_views
 from krispcall.campaigns import services as camp_services
 from krispcall.konference.service_layer.event_handlers import call_handlers
 from krispcall.campaigns.domain import models as campaign_models
-from krispcall.twilio.krispcall_twilio import TwilioClient
+from krispcall.twilio.twilio_client import TwilioClient
 from krispcall.konference.billing.enums import (
     BillingTypeEnum,
     ConferencParticipantEnum,

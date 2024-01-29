@@ -1,4 +1,4 @@
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.common.static_helpers import url_safe_decode
 from krispcall.konference import services
 from starlette.endpoints import HTTPEndpoint

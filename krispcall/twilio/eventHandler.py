@@ -2,10 +2,10 @@ import copy
 import json
 from typing import Any
 from uuid import UUID
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 from krispcall.twilio.utils import sub_client
-from krispcall_twilio.twilio_client import TwilioClient
+from krispcall.twilio.twilio_client import TwilioClient
 
 
 class TwilioEventHandler:

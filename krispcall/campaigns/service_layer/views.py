@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from uuid import UUID
 from krispcall.campaigns.service_layer.abstracts import CampPaginationParams
-from krispcall.common.services.pagination import PaginationParams
-from krispcall.common.services.pagination import CursorPagination
+# from krispcall.common.services.pagination import PaginationParams
+# from krispcall.common.services.pagination import CursorPagination
 import sqlalchemy as sa
 from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.adapters import orm
+from krispcall.common.responses.response_model import PaginationParams
+# from krispcall.common.services.abstracts import PaginationParams
+from krispcall.common.services.pagination.pagination import CursorPagination
 
 
 async def get_campaign_contact_list(

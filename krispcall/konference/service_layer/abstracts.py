@@ -3,7 +3,7 @@ from enum import Enum, unique
 import typing
 from uuid import UUID
 from typing import TypedDict, Union
-from krispcall.common.abstracts import DataModel
+from krispcall.common.with_response import DataModel
 from dataclasses import dataclass
 from krispcall.konference.domain.models import (
     ConferenceStatus,
@@ -18,7 +18,7 @@ from krispcall.konference.domain.models import (
     RecordingDuration,
     CallDuration,
 )
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 
 # Data models

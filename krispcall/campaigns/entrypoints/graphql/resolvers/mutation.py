@@ -5,22 +5,29 @@ from typing import Any, Dict
 from aiobotocore import session
 from uuid import uuid4
 from redis import Redis
+from krispcall.auth.constant import AUTHENTICATED_ACCESS_USER
 
 from krispcall.auth.requires_auth_power_dialer import (
+    required_scope,
     requires_power_dialer_enabled,
 )
 from pydantic import ValidationError
 from ariadne import convert_kwargs_to_snake_case
 from graphql.type.definition import GraphQLResolveInfo
 from pydantic import ValidationError
+from krispcall.common.services.file_storage.csv_file_helper import process_contacts_csv
+from krispcall.common.error_handler.exceptions import CSVProcessingError
+from krispcall.common.responses.responses import create_error_response
 
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
+from krispcall.common.error_handler.translator import get_translator
 from krispcall.twilio.utils import TwilioClient
 from krispcall.common.database.connection import DbConnection
-from krispcall.common.request_helpers import get_database
+from krispcall.common.app_settings.request_helpers import get_database
 
 
-# from krispcall.common.service_layer import status
+from krispcall.common.services import status as status
+from krispcall.twilio.utils import sub_client
 # from krispcall.common.service_layer.static_helpers import (
 #     get_translator,
 # )
@@ -296,8 +303,7 @@ async def resolve_add_campaign_voicemail(
         boto_session = session.get_session()
         settings = request.app.state.settings
         try:
-            # print("File uploaded")
-            await upload_file(
+            await upload_file_to_s3(
                 boto_session, settings, validated_data.file, upload_name
             )
         except Exception as e:

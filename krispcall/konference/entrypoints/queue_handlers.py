@@ -7,7 +7,7 @@ from krispcall.konference import services
 from krispcall.konference.adapters.provider import get_provider_details
 from uuid import UUID
 import dateutil
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.konference.domain.models import (
     AgentReference,
     ConferenceStatus,

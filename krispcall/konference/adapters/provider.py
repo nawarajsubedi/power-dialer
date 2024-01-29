@@ -10,7 +10,7 @@ from krispcall.konference.adapters.protobufs import (
     outbound_call_pb2,
     outbound_call_pb2_grpc,
 )
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 
 BILLING_RPC_LOCAL_ADDRESS = "[::]:8005"

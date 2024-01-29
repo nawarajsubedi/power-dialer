@@ -3,9 +3,6 @@ unit of work classes
 """
 from __future__ import annotations
 
-from krispcall.addon.databases.unit_of_work import SqlAlchemyUnitOfWork
-from krispcall.core.protocols.database import DbConnection
-
 from krispcall.campaigns.adapters.repositories import (
     CampaignCallNotesRepository,
     CampaignContactListRepository,
@@ -14,6 +11,8 @@ from krispcall.campaigns.adapters.repositories import (
     CampaignsRepository,
     CampaignStatRepository,
 )
+from krispcall.common.database.connection import DbConnection
+from krispcall.common.database.unit_of_work import SqlAlchemyUnitOfWork
 
 
 class CampaignContactSqlUnitOfWork(SqlAlchemyUnitOfWork):

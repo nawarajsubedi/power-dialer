@@ -7,7 +7,7 @@ import typing
 import sqlalchemy as sa
 from databases import Database
 
-from krispcall.web import error_handlers  # type: ignore
+from krispcall.common.error_handler import error_handlers
 
 SQL_METADATA = sa.MetaData()
 
@@ -18,19 +18,18 @@ def get_metadata(schema: typing.Optional[str] = None) -> sa.MetaData:
     return SQL_METADATA
 
 
-# from krispcall.web import error_handlers
 from krispcall.common.database.exceptions import (
     DuplicateEntity,
     EntityContractFailed,
     NonExistingEntity,
 )
-from krispcall.core.exceptions import (
+from krispcall.common.error_handler.exceptions import (
     FailedIdentityException,
     FailedPermissionException,
+    HTTPException,
+    RequestValidationError
 )
-from krispcall.addon.databases.settings import DatabaseSettings
-from krispcall.addon.auth.exceptions import RequestValidationError
-from krispcall.web.exceptions import HTTPException
+from krispcall.common.database.settings import DatabaseSettings
 
 
 def load_exception_handlers() -> dict[typing.Any, typing.Any]:
@@ -47,11 +46,11 @@ def load_exception_handlers() -> dict[typing.Any, typing.Any]:
 
 
 def init_database(settings: DatabaseSettings) -> Database:
-    """load/unload postgres engine"""
-    if settings.is_testing:
-        return Database(
-            settings.pg_dsn, ssl=settings.pg_use_ssl, force_rollback=True
-        )
+    # """load/unload postgres engine"""
+    # if settings.is_testing:
+    #     return Database(
+    #         settings.pg_dsn, ssl=settings.pg_use_ssl, force_rollback=True
+        # )
     return Database(
         settings.pg_dsn,
         ssl=settings.pg_use_ssl,

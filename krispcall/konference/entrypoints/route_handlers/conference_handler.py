@@ -1,8 +1,8 @@
 # Handles the event for the conference
 import json
 from krispcall.common.services.helper import convert_dict_to_snake_case
-from krispcall.common.shortid import ShortId
-from krispcall.common.static_helpers import url_safe_decode
+from krispcall.common.utils.shortid import ShortId
+from krispcall.common.utils.static_helpers import url_safe_decode
 from krispcall.konference import services
 from redis import Redis
 from starlette.endpoints import HTTPEndpoint

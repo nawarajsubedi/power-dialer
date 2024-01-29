@@ -5,7 +5,7 @@ from krispcall.common.database.connection import DbConnection
 from krispcall.providers.queue_service.job_queue import JobQueue
 
 from krispcall.twilio.enums import ActiveStatusEnum, NotActiveStatusEnum
-from krispcall.twilio.krispcall_twilio.twilio_client import TwilioClient
+from krispcall.twilio.twilio_client import TwilioClient
 from krispcall.twilio.utils import get_conference_resource
 from krispcall.konference.billing.enums import BillingTypeEnum
 from krispcall.konference.domain import models

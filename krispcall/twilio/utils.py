@@ -1,13 +1,13 @@
 import copy
 import json
 from uuid import UUID
-from krispcall.common.shortid import ShortId
-from krispcall.common.exceptions import CPaaSAuthenticationException
+from krispcall.common.utils.shortid import ShortId
+from krispcall.common.error_handler.exceptions import CPaaSAuthenticationException
 from krispcall.twilio.models import ConferenceResource, AccountCredential
 
 from redis import Redis
-from krispcall.twilio.utils import sub_client
-from krispcall_twilio.twilio_client import TwilioClient
+# from krispcall.twilio.utils import sub_client
+from krispcall.twilio.twilio_client import TwilioClient
 
 
 async def get_call_details(

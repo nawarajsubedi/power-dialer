@@ -1,0 +1,49 @@
+type Query {
+
+  # getBulkSmsContactListPaginated(
+  #   params: ConnectionInput,
+  #   fetchArchived: Boolean!
+  # ): BulkSmsContactListPaginated!
+  # getBulkSmsContactDetailList(
+  #   id: ShortId!
+  # ): BulkSmsContactDetailsPayload!
+  # getBulkSmsTemplateListPaginated(params:ConnectionInput): BulkSmsTemplateListPaginated!
+  # getBulkSmsCampaignList(params: ConnectionInput,
+  # fetchArchived: Boolean!): BulkSmsCampaignListPaginated!
+  # getBulkSmsCampaignDataPaginated(
+  #   params: ConnectionInput,
+  #   id: ShortId!
+  # ): BulkSmsCampaignDataPaginated!
+  # getBulkSmsCampaignInsight(
+  #   id: ShortId!
+  # ): BulkSmsCampaignsInsightPayload
+  # getBulkSmsCampaignsCount: BulkSmsCampaignsCountPayload
+  # getBulkSmsContactList(
+  #   fetchArchived: Boolean!
+  # ): BulkSmsContactListPayload!
+  # getBulkSmsTemplateList: BulkSmsTemplateListPayload!
+  # getBulkSmsCampaignData(
+  #   id: ShortId!
+  # ): BulkSmsCampaignDataPayload!
+
+
+  getCampaignContactList(
+    fetchArchived: Boolean!
+  ): WorkspaceCampaignContactListPayload!
+  getCampaignContactDetailList(
+    id: ShortId!
+  ): WorkspaceCampaignContactDetailsPayload!
+  getCampaignVoiceMailList: CampaignVoicemailListPayload!
+  getCampaignCallScriptList: CampaignCallScriptListPayload!
+  getCampaignsList(fetchArchived: Boolean!, params: CampaignListCursor): WorkspaceCampaignsPayload!
+  getCampaignCallScriptAttributeList: CampaignCallScriptAttributeListPayload!
+  getCallScriptById(callScriptId: ShortId!): CampaignCallScriptByIdPayload!
+  campaignAnalytics(input: CampaignAnalyticsInput!, params: CampaignAnalyticsCursor): CampaignAnalyticsPayload!
+  campaignStats(input: CampaignStatsInput!): CampaignStatsPayload!
+  campaignNote(input: CampaignNoteInput!): CampaignNotePayload!
+  campaignDetails(input: CampaignDetailsInput!): CampaignDetailsPayload!
+  campaignVoicemail(input: CampaignVoicemailInput!): CampaignVoicemailPayload!
+  campaignCallScript(input: CampaignCallScriptInput!): CallScriptPayload!
+  campaignsCount: CampaignsCountPayload!
+
+}

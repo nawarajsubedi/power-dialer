@@ -6,13 +6,12 @@ import typing
 import uuid
 import time
 from krispcall.common.database.connection import DbConnection
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from uuid import UUID, uuid4
+from krispcall.common.utils.static_helpers import url_safe_encode
 
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings import Settings
-from krispcall.common.static_helpers import url_safe_encode
-from krispcall.twilio.krispcall_twilio import TwilioClient, twilio_client
+from krispcall.common.app_settings.app_settings import Settings
 from krispcall.konference.service_layer import abstracts, helpers, views
 from krispcall.konference import services
 from krispcall.konference.domain import models
@@ -20,6 +19,8 @@ from krispcall.campaigns.domain import models as campaign_models
 from krispcall.campaigns.service_layer import views as campaign_views
 from krispcall.campaigns import services as camp_services
 from redis import Redis
+
+from krispcall.twilio.twilio_client import TwilioClient
 
 
 async def add_agent(

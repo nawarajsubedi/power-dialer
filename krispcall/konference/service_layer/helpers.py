@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID, uuid4
 from krispcall.konference.service_layer import abstracts
 from krispcall.konference.domain import models
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 
 
 def create_conversation_data(

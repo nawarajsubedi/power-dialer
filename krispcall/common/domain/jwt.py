@@ -5,8 +5,7 @@ from __future__ import annotations
 import typing
 from uuid import UUID
 
-from krispcall.core.adapters.datetime import Duration, utc_now
-from krispcall.core.domain.entities import BaseEntity
+from krispcall.common.domain.entities import BaseEntity
 
 
 class JWTClaim(BaseEntity):

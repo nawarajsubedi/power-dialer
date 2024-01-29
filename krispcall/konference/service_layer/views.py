@@ -1,12 +1,12 @@
 import typing
 from uuid import UUID
-from krispcall.common.services.abstracts import PaginationParams
+from krispcall.common.responses.response_model import PaginationParams
+from krispcall.common.services.pagination.pagination import CursorPagination
 from krispcall.konference.domain import models
 from krispcall.konference.adapters import orm
 from krispcall.konference.service_layer import unit_of_work
 from krispcall.common.database.connection import DbConnection
 import sqlalchemy as sa
-from krispcall.common.services.pagination import CursorPagination
 
 
 # async def get_campaign_conference_by_twi_sid(

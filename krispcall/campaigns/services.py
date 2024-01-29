@@ -8,14 +8,14 @@ from krispcall.campaigns.service_layer.exceptions import (
     CampaignAlreadyPaused,
 )
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings import Settings
+from krispcall.common.app_settings.app_settings import Settings
 from krispcall.konference.domain.models import CampaignConversation
 from loguru import logger
 from starlette.requests import Request
 from datetime import date, datetime
 from typing import Dict, List, Union
 from uuid import UUID, uuid4
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.domain import commands, models
 from krispcall.campaigns.service_layer import (

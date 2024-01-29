@@ -1,0 +1,74 @@
+type Mutation {
+# createBulkSmsContactList(
+#   data: BulkSmsContactCSVInputData!
+#   ): UploadBulkSmsContactPayload!
+#   uploadBulkSmsContactDetailCSV(
+#     data: BulkSmsContactDetailCSVInputData!
+#   ): UploadBulkSmsContactPayload!
+#   updateBulkSmsContactList(
+#     data: UpdateBulkSmsContactListInputData!
+#   ): UpdateBulkSmsContactListPayload!
+#   addBulkSmsContactDetail(
+#     data: AddBulkSmsContactDetailInputData!
+#   ): AddBulkSmsContactDetailPayload!
+#   deleteBulkSmsContactDetails(
+#     data: DeleteBulkSmsContactDetailInputData!
+#   ): DeleteBulkSmsContactDetailPayload
+#   addBulkSmsTemplate(
+#     data: BulkSmsTemplateInputData!
+#   ): BulkSmsTemplatePayload!
+#   updateBulkSmsTemplate(
+#     data: UpdateBulkSmsTemplateInputData!
+#   ): UpdateBulkSmsTemplatePayload
+#   updateDefaultBulkSmsTemplate(
+#     data: UpdateDefaultBulkSmsTemplateInputData!
+#   ): UpdateBulkSmsTemplatePayload!
+#   deleteBulkSmsTemplate(
+#     data: UpdateDefaultBulkSmsTemplateInputData!
+#   ): UpdateBulkSmsTemplatePayload!
+#   createBulkSmsCampaigns(data: CreateBulkSmsCampaignsInputData!): ResourceSucceedPayload!
+#   updateBulkSmsCampaigns(data: UpdateBulkSmsCampaignsInputData!): ResourceSucceedPayload!
+#   runBulkSmsCampaigns(data: RunBulkSmsCampaignsInputData!): ResourceSucceedPayload!
+  createCampaignContactList(
+    data: CampaignContactCSVInputData!
+  ): UploadCampaignContactPayload!
+  uploadCampaignContactDetailCSV(
+    data: CampaignContactDetailCSVInputData!
+  ): UploadCampaignContactPayload!
+  updateCampaignContactList(
+    data: UpdateCampaignContactListInputData!
+  ): UpdateCampaignContactListPayload!
+  addCampaignContactDetail(
+    data: AddCampaignContactDetailInputData!
+  ): AddCampaignContactDetailPayload!
+  deleteCampaignContactDetails(
+    data: DeleteCampaignContactDetailInputData!
+  ): DeleteCampaignContactDetailPayload
+  addCampaignVoicemailDrop(
+    data: CampaignVoiceMailDropInputData!
+  ): CampaignVoiceMailDropPayload!
+  updateCampaignVoicemailDrop(
+    data: UpdateCampaignVoiceMailInputData!
+  ): UpdateCampaignVoicemailPayload!
+  addCampaignCallScripts(
+    data: CampaignCallScriptInputData!
+  ): CampaignCallScriptPayload!
+  updateCampaignCallScripts(
+    data: UpdateCallScriptInputData!
+  ): UpdateCampaignCallScriptPayload!
+  createCampaigns(data: CreateCampaignsInputData!): CreateCampaignPayload!
+  archiveCampaign(data: ArchiveCampaignsInputData!): ArchiveCampaignPayload!
+  updateCampaign(data: UpdateCampaignsInputData!): UpdateCampaignPayload!
+  skipCampaignConversation(data: SkipCampaignConversationInput!): SkipCampaignConversationPayload!
+  controlCampaign(data: ControlCampaignInput!): ControlCampaignPayload!
+  holdCampaignConversation(data: HoldCampaignConversationInput!): HoldCampaignConversationPayload!
+  createCampaignCallNote(
+    data: CampaignCallNoteInputData!
+  ): CampaignCallNotePayload!
+  updateCampaignCallNote(
+    data: CampaignCallNoteUpdateInputData!
+  ): CampaignCallNotePayload!
+  recordCampaignConversation(input: CampaignConversationRecordInput): CampaignConversationRecordPayload
+  campaignVoicemailDrop(input: VoicemailDropInput!): VoicemailDropPayload!
+
+}

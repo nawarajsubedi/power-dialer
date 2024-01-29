@@ -1,10 +1,8 @@
 import copy
 import json
-from krispcall.common.static_helpers import url_safe_decode
-# from ariadne import convert_kwargs_to_snake_case
-
+from krispcall.common.utils.static_helpers import url_safe_decode
 from krispcall.konference.domain.models import ConferenceStatus
-from krispcall.common.request_helpers import get_database
+from krispcall.common.app_settings.request_helpers import get_database
 from redis import Redis
 from starlette.endpoints import HTTPEndpoint
 from starlette.requests import Request
@@ -15,7 +13,7 @@ from krispcall.konference.service_layer import (
 )
 from krispcall.common.services.helper import change_camel_case_to_snake
 from krispcall.konference import services
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.twilio.utils import TwilioClient, sub_client
 
 

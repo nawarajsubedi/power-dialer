@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from pydantic import validator
 
-from krispcall.core.domain.entities import BaseEntity
+from krispcall.common.domain.entities import BaseEntity
 
 DataDict = Dict[str, Any]
 

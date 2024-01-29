@@ -1,14 +1,14 @@
 import asyncio
 from functools import wraps
 from krispcall.auth.constant import TOKEN_EXPIRED
-from krispcall.common.shortid import ShortId
+from krispcall.common.utils.shortid import ShortId
 from krispcall.common.services import status as HTTP_STATUS_CODE
 
 from starlette.authentication import has_required_scope
 from typing import Any, Callable, List
 from krispcall.auth.enums import AuthFeatureEnum
-from krispcall.common.responses import create_error_response
-from krispcall.common.translator import get_translator
+from krispcall.common.responses.responses import create_error_response
+from krispcall.common.error_handler.translator import get_translator
 from krispcall.providers.foundation_provider import get_workspace_feature
 
 
@@ -35,7 +35,7 @@ def requires_power_dialer_enabled(func: Callable):
         return create_error_response(
             translator=get_translator(request),
             message="Sales dailer feature disabled!",
-            error_status=http_status_code.HTTP_403_FORBIDDEN,
+            error_status=HTTP_STATUS_CODE.HTTP_403_FORBIDDEN,
         )
 
     return wrapper

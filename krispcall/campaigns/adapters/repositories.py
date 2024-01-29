@@ -7,7 +7,7 @@ from uuid import UUID
 
 from sqlalchemy.dialects import postgresql
 from sqlalchemy import select
-from krispcall.core.protocols.database import DbConnection
+from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.domain import models
 from krispcall.campaigns.adapters.orm import (
     campaign_contact_list_detail,
