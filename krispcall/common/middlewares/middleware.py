@@ -1,13 +1,6 @@
 import typing
-from jose import jwt  # type: ignore
 import logging
-import typing
-
 from jose import jwt
-
-from krispcall.common.middlewares.user import create_authenticated_principal_user  # type: ignore
-
-LOGGER = logging.getLogger(__name__)
 
 from starlette.authentication import (
     AuthCredentials,
@@ -18,36 +11,24 @@ from starlette.authentication import (
 from starlette.requests import HTTPConnection
 from starlette.responses import PlainTextResponse, Response
 from starlette.types import ASGIApp, Receive, Scope, Send
-
-from krispcall.common.app_settings.request_helpers import get_app_settings
-from krispcall.common.error_handler.exceptions import FailedIdentityException, TokenException, TokenSignatureExpiredException
-from krispcall.common.utils.datetime import utc_now
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from krispcall.common.middlewares.user import create_authenticated_principal_user  # type: ignore
+from krispcall.common.app_settings.request_helpers import get_app_settings
+from krispcall.common.error_handler.exceptions import (
+    FailedIdentityException,
+    TokenException,
+    TokenSignatureExpiredException,
+)
+from krispcall.common.utils.datetime import utc_now
+
+LOGGER = logging.getLogger(__name__)
 
 
 class InvalidTokenException(FailedIdentityException):
     """Invalid Token"""
 
     message = "Invalid Token"
-
-
-def decode_token(
-    token: str, secret: str, algorithms: typing.List[str], audience: str
-) -> typing.Optional[typing.Dict]:
-    """decode jwt token with secret"""
-    payload = None
-    try:
-        payload = jwt.decode(
-            token=token, key=secret, algorithms=algorithms, audience=audience
-        )
-    except jwt.ExpiredSignatureError as e: # type: ignore
-        LOGGER.warning(e)
-        raise TokenSignatureExpiredException("Token Signature Expired.")
-
-    except jwt.JWTError as e: # type: ignore
-        LOGGER.warning(e)
-        raise InvalidTokenException() # type: ignore
-    return payload
 
 
 class AuthenticationMiddleware:
@@ -90,22 +71,6 @@ class AuthenticationMiddleware:
     def default_on_error(conn: HTTPConnection, exc: Exception) -> Response:
         return PlainTextResponse(str(exc), status_code=400)
 
-
-def on_authentication_error(_, exc):
-    raise exc
-
-def get_authorization_token(authorization: str, prefix: str) -> str:
-
-    scheme, token = authorization.strip().split(" ")
-    if scheme.strip().casefold() != prefix:
-
-        raise ValueError("Invalid authorization scheme.")
-
-    if not token:
-
-        raise ValueError("Missing token.")
-
-    return token
 
 class JWTAuthenticationBackend(AuthenticationBackend):
     def __init__(self, secret: str, prefix: str = "JWT", audience: str = ""):
@@ -167,3 +132,36 @@ class ResponseMiddleware(BaseHTTPMiddleware):
         response.headers["Response-Time"] = utc_now().isoformat()
         return response
 
+
+def on_authentication_error(_, exc):
+    raise exc
+
+
+def get_authorization_token(authorization: str, prefix: str) -> str:
+    scheme, token = authorization.strip().split(" ")
+    if scheme.strip().casefold() != prefix:
+        raise ValueError("Invalid authorization scheme.")
+
+    if not token:
+        raise ValueError("Missing token.")
+
+    return token
+
+
+def decode_token(
+    token: str, secret: str, algorithms: typing.List[str], audience: str
+) -> typing.Optional[typing.Dict]:
+    """decode jwt token with secret"""
+    payload = None
+    try:
+        payload = jwt.decode(
+            token=token, key=secret, algorithms=algorithms, audience=audience
+        )
+    except jwt.ExpiredSignatureError as e:  # type: ignore
+        LOGGER.warning(e)
+        raise TokenSignatureExpiredException("Token Signature Expired.")
+
+    except jwt.JWTError as e:  # type: ignore
+        LOGGER.warning(e)
+        raise InvalidTokenException()  # type: ignore
+    return payload

@@ -631,8 +631,6 @@ async def control_campaign(
             and campaign.campaign_status == "inprogress"
         ):
             raise CampaignAlreadyActive("Campaign is already active.")
-        # Note Nawaraj need to verify
-        created_by = campaign.created_by_name # type: ignore
         campaign_ = handlers.control_campaign(
             commands.ControlCampaignCommand(
                 campaign=campaign,
@@ -643,7 +641,7 @@ async def control_campaign(
             )
         )
 
-        await uow.repository.update_campaigns(campaign_, member, created_by)
+        await uow.repository.update_campaigns(campaign_, member, campaign.created_by)
 
     # Pass the command over to the konference (Twilio Powerdialer) component
     # right now we are calling the component directly

@@ -15,6 +15,8 @@ from pydantic import ValidationError
 from ariadne import convert_kwargs_to_snake_case
 from graphql.type.definition import GraphQLResolveInfo
 from pydantic import ValidationError
+from krispcall.campaigns.service_layer.exceptions import CampaignAlreadyEnded, CampaignAlreadyPaused
+from krispcall.common.bootstrap import JobQueue
 from krispcall.common.services.file_storage.csv_file_helper import process_contacts_csv
 from krispcall.common.error_handler.exceptions import CSVProcessingError
 from krispcall.common.responses.responses import create_error_response
@@ -149,7 +151,7 @@ async def resolve_update_campaign_contact_list(
         )
         return abstracts.campaign_contact_list_update(resource=resource).dict()
 
-    except ValidationError:
+    except ValidationError as e:
         return create_error_response(
             translator=get_translator(request),
             message="Invalid input",
@@ -533,7 +535,7 @@ async def resolve_create_campaigns(
             "error": None,
         }
 
-    except ValidationError:
+    except ValidationError as e:
         return create_error_response(
             translator=get_translator(request),
             message="Invalid input",
@@ -914,7 +916,13 @@ async def resolve_control_campaign(
     except (ValidationError, ValueError):
         return create_error_response(
             translator=get_translator(request),
-            message="Invalid Input",
+            message=status.HTTP_400_INVALID_INPUT[2],
+            error_status=status.HTTP_400_INVALID_INPUT,
+        )
+    except (CampaignAlreadyEnded, CampaignAlreadyPaused):
+        return create_error_response(
+            translator=get_translator(request),
+            message=status.HTTP_400_INVALID_INPUT[2],
             error_status=status.HTTP_400_INVALID_INPUT,
         )
     except Exception as error:

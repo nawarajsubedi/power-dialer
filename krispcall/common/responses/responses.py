@@ -21,7 +21,10 @@ class ErrorResponseModel(GenericModel):
 
 
 def create_error_response(
-    *, message: typing.Union[str, typing.Tuple[str, typing.Any]], error_status: ErrorKeyTuple, translator=None
+    *,
+    message: typing.Union[str, typing.Tuple[str, typing.Any]],
+    error_status: ErrorKeyTuple,
+    translator=None
 ) -> ErrorDict:
     if translator:
         message_str = ""
@@ -31,7 +34,7 @@ def create_error_response(
     if error_status[0] == HTTP_500_INTERNAL_SERVER_ERROR[0]:
         logger.error(message)
         message = HTTP_500_INTERNAL_SERVER_ERROR[2]
-    
+
     if isinstance(message, str):
         message_str = message
     elif isinstance(message, object):
@@ -47,16 +50,19 @@ def create_error_response(
     ).dict()
 
 
-
 def extract_error_message(message: typing.Union[str, typing.Any]) -> str:
     if isinstance(message, str):
         return message
-    
+
     try:
         message_errors = message.errors()
-        if message_errors and isinstance(message_errors, list) and message_errors[0].get('msg') is not None:
-            return message_errors[0]['msg']
+        if (
+            message_errors
+            and isinstance(message_errors, list)
+            and message_errors[0].get("msg") is not None
+        ):
+            return message_errors[0]["msg"]
     except ValidationError:
         pass  # Ignore validation error
-    
+
     return "An unexpected error occurred."

@@ -13,7 +13,7 @@ from krispcall.konference.domain.models import (
     ConferenceStatus,
     ParticipantType,
 )
-from krispcall.twilio.krispcall_twilio import TwilioClient
+from krispcall.twilio.utils import TwilioClient
 from krispcall.konference.service_layer import views, abstracts
 from krispcall.konference.service_layer.event_handlers import call_handlers
 from krispcall.campaigns.service_layer import views as campaign_views

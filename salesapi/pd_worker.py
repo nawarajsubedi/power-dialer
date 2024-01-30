@@ -1,7 +1,7 @@
+from krispcall.common.database.bootstrap import init_database
 from salesapi import settings as config
-from krispcall.addon.databases.bootstrap import init_database
+from krispcall.common import bootstrap
 from arq.connections import RedisSettings
-from krispcall.common.core import bootstrap
 from krispcall.konference.entrypoints import queue_handlers
 from krispcall.campaigns.entrypoints import queue_handlers as camp_queues
 from krispcall.konference.billing import billing_task_queue as billing_queues
@@ -16,11 +16,11 @@ async def startup(ctx):
     ctx["settings"] = settings
     ctx["db"] = init_database(ctx["settings"])
     ctx["twilio"] = bootstrap.init_twillo(ctx["settings"])
-    ctx["broadcaster"] = bootstrap.init_broadcaster(ctx["settings"])
+    # ctx["broadcaster"] = bootstrap.init_broadcaster(ctx["settings"])
     ctx["queue"] = bootstrap.init_queue(ctx["settings"])
     await ctx["db"].connect()
     await ctx["queue"].connect()
-    await ctx["broadcaster"].connect()
+    # await ctx["broadcaster"].connect()
 
 
 async def shutdown(ctx):

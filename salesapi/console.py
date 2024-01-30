@@ -20,20 +20,12 @@ class CliCommand:
     def serve(self, host: str = "127.0.0.1", port: int = 3001):
         """Serves the sales dialer api"""
         uvicorn.run(
-            "salesapi.main:app",
+            "main:app",
             host=host,
             port=port,
             log_level="info",
             reload=True,
         )
-
-def get_alembic_config() -> Config:
-    """return alembic config object"""
-    alembic_path = Path(constants.__file__).parent
-    alembic_ini_file = alembic_path.joinpath("alembic.ini")
-    config = Config(str(alembic_ini_file))
-    config.set_main_option("script_location", str(alembic_path))
-    return config
 
 
 class AlembicCommand:
@@ -118,4 +110,12 @@ class AlembicCommand:
         """show revision info"""
         command.show(self.alembic_cfg, rev=rev)
 
+
+def get_alembic_config() -> Config:
+    """return alembic config object"""
+    alembic_path = Path(constants.__file__).parent
+    alembic_ini_file = alembic_path.joinpath("alembic.ini")
+    config = Config(str(alembic_ini_file))
+    config.set_main_option("script_location", str(alembic_path))
+    return config
 

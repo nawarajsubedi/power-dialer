@@ -258,8 +258,9 @@ async def handle_conference_event(
                 cache,
                 queue,
                 twilio_client,
-                charge_call_back_time=CHARGE_START_CALL_TIME,  # For the first time charge job schedule should run after CHARGE_START_CALL_TIME
-                # And then it should run after every CHARGE_CALL_BACK_TIME
+                charge_call_back_time=CHARGE_START_CALL_TIME,  
+                # For the first time charge job schedule should run after CHARGE_START_CALL_TIME-50 time
+                # And then it should run every minutes after 55 CHARGE_CALL_BACK_TIME time
             )
 
             if (

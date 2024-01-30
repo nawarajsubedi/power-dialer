@@ -76,7 +76,7 @@ class AppSettings(Settings):
     components: typing.List[str] = [
         "krispcall.campaigns",
         "krispcall.konference",
-        "krispcall.bulksms",
+        # "krispcall.bulksms",
     ]
 
     agent_jwt_audience: str = "com.timetracko.tracker"

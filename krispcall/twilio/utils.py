@@ -54,7 +54,7 @@ async def get_conference_resource(
 def get_subaccount_credential_from_cache(cache: Redis, campaign_id: UUID):
     values = cache.get(ShortId.with_uuid(campaign_id)) or {}
 
-    camp_obj = json.loads(str(values))
+    camp_obj = json.loads(values)
     credentials: AccountCredential = camp_obj.get("cpass_user")
     return credentials
 

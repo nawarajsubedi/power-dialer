@@ -35,6 +35,11 @@ aiobotocore = "^1.4.0"
 pandas = "^1.2.4"
 PyYAML = "5.4.1"
 rollbar = "^0.16.3"
+python-multipart = "^0.0.5"
+fire = "^0.3.1"
+
+[tool.poetry.scripts]
+cli = "salesapi.sales_app:main"
 
 [build-system]
 requires = ["poetry-core"]

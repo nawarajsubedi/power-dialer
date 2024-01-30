@@ -152,7 +152,7 @@ def campaign_contact_list_update(response_factory, *, resource):
             name=resource.name,
         ),
         meta=None,
-        status=HTTP_200_OK,
+        status=HTTP_200_OK[0],
     )
 
 
@@ -228,9 +228,7 @@ def get_campaign(response_factory, *, resource):
                 "call_attempts_enabled": record["call_attempts_enabled"],
                 "call_attempts_count": record["call_attempts_count"],
                 "call_attempts_gap": record["call_attempts_gap"],
-                "is_contact_list_hidden": record[
-                    "is_imported_contact_list_hidden"
-                ],
+                "is_contact_list_hidden": record["is_imported_contact_list_hidden"],
                 "call_script_enabled": record["call_script_enabled"],
                 "is_archived": record["is_archived"],
                 "call_script_id": record["call_script_id"],
@@ -247,6 +245,7 @@ def get_campaign(response_factory, *, resource):
         )
     campaign_list = [CampaignListData.construct(**c) for c in data]
     return create_success_response(data=campaign_list)
+
 
 class AddCallScripts(DataModel):
     created_by_name: str
@@ -314,9 +313,7 @@ def get_campaign_callScripts_attributes(response_factory, *, resource):
                 "description": record["description"],
             }
         )
-    call_scripts = [
-        CampaignCallScriptsAtributeListData.construct(**c) for c in data
-    ]
+    call_scripts = [CampaignCallScriptsAtributeListData.construct(**c) for c in data]
     return create_success_response(data=call_scripts)
 
 
@@ -495,7 +492,7 @@ class PaginatedResource(ResourceModel):
 
 @with_response(PaginatedResource)
 def create_paginated_response(response_model, *, resource: PaginatedResource):
-    return response_model(data=resource, meta=None, status=200)
+    return response_model(data=resource, meta=None, status=HTTP_200_OK[0])
 
 
 class CampaignAnalyticsInput(DataModel):
@@ -512,23 +509,20 @@ class CampaignAnalyticsData(ResourceModel):
 
 @with_response(CampaignAnalyticsData)
 def get_campaign_analytics(response_factory, *, resource):
-    return {
-        "status": HTTP_200_OK,
-        "error": None,
-        "data": [
-            {
-                "conversationId": record.get("id"),
-                "status": record.get("status"),
-                "contactName": record.get("contact_name"),
-                "contactNumber": record.get("contact_number"),
-                "recordingDuration": record.get("recording_duration"),
-                "callDuration": record.get("call_duration"),
-                "recordingUrl": record.get("recording_url"),
-                "callStartTime": record.get("created_at"),
-            }
-            for record in resource
-        ],
-    }
+    data = [
+        {
+            "conversationId": record.get("id"),
+            "status": record.get("status"),
+            "contactName": record.get("contact_name"),
+            "contactNumber": record.get("contact_number"),
+            "recordingDuration": record.get("recording_duration"),
+            "callDuration": record.get("call_duration"),
+            "recordingUrl": record.get("recording_url"),
+            "callStartTime": record.get("created_at"),
+        }
+        for record in resource
+    ]
+    return create_success_response(data=data)
 
 
 class CampaignStatsData(ResourceModel):
@@ -560,16 +554,11 @@ def get_campaign_stats(response_factory, *, resource):
             "active_call_duration": resource.get("active_call_duration"),
             "campaign_duration": resource.get("active_call_duration")
             + (
-                15
-                * (
-                    resource.get("answered_calls")
-                    + resource.get("unanswered_calls")
-                )
+                15 * (resource.get("answered_calls") + resource.get("unanswered_calls"))
             ),
         }
     )
-
-    return {"status": HTTP_200_OK, "error": None, "data": data}
+    return create_success_response(data=data)
 
 
 class CampaignNote(ResourceModel):
@@ -640,11 +629,7 @@ class CampaignDetails(ResourceModel):
 
 @with_response(CampaignDetails)
 def get_campaign_details(response_factory, *, resource):
-    return {
-        "status": HTTP_200_OK,
-        "error": None,
-        "data": resource,
-    }
+    return create_success_response(data=resource)
 
 
 class VoicemailDropResource(ResourceModel):

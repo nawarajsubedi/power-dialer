@@ -14,6 +14,7 @@ from krispcall.konference.service_layer import (
 from krispcall.common.services.helper import change_camel_case_to_snake
 from krispcall.konference import services
 from krispcall.common.utils.shortid import ShortId
+from krispcall.providers.queue_service.job_queue import JobQueue
 from krispcall.twilio.utils import TwilioClient, sub_client
 
 
@@ -126,6 +127,7 @@ class CampaignAgentHandler(HTTPEndpoint):
         if call_status == "initiated":
             return Response(status_code=200, media_type="application/xml")
         db_conn = get_database(request)
+        job_queue: JobQueue = request.app.state.queue
         data = {
             change_camel_case_to_snake(replace_from(key)): value
             for key, value in data.items()
@@ -141,7 +143,7 @@ class CampaignAgentHandler(HTTPEndpoint):
             "no-answer",
             "noanswer",
         ]:
-            await request.app.state.queue.enqueue_job(
+            await job_queue.enqueue_job(
                 "expire_cache",
                 data=[validated_data.call_sid],
                 queue_name="arq:pd_queue",
