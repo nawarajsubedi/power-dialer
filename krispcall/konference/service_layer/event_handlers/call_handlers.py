@@ -6,12 +6,14 @@ import typing
 import uuid
 import time
 from krispcall.common.database.connection import DbConnection
+from krispcall.common.services.status import HTTP_404_CONTACT_LIST_NOT_FOUND
 from krispcall.common.utils.shortid import ShortId
 from uuid import UUID, uuid4
-from krispcall.common.utils.static_helpers import url_safe_encode
+from krispcall.common.utils.helpers import url_safe_encode
+from krispcall.konference.service_layer.exceptions import ContactNotFoundException
 
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings.app_settings import Settings
+from krispcall.common.configs.app_settings import Settings
 from krispcall.konference.service_layer import abstracts, helpers, views
 from krispcall.konference import services
 from krispcall.konference.domain import models
@@ -160,6 +162,8 @@ async def start_campaign_loop(
     contact_list = await campaign_views.get_campaign_contact_dtl_list(
         contact_master_id=campaign.contact_list_id, db_conn=db_conn
     )
+    # if len(contact_list) <= 0:
+    #     raise ContactNotFoundException(HTTP_404_CONTACT_LIST_NOT_FOUND.status_message)
 
     # conversation data with all the campaign conversation is created here
     # because, this data needs to be sent to the frontend

@@ -6,7 +6,7 @@ from typing import Any, List, Optional, Union, Literal
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, Field, root_validator
-from krispcall.common.responses.response_model import create_success_response
+from krispcall.common.models.response_model import create_success_response
 from krispcall.common.services.pagination.query import QueryModel
 from krispcall.common.services.status import HTTP_200_OK
 
@@ -165,7 +165,7 @@ def campaign_add_contact_detail(response_factory, *, resource):
             number=resource.contact_number,
         ),
         meta=None,
-        status=HTTP_200_OK,
+        status=HTTP_200_OK.status_code,
     )
 
 

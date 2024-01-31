@@ -5,7 +5,7 @@ from starlette.applications import Starlette
 from krispcall.common import bootstrap
 from krispcall.common.database.bootstrap import init_database, load_exception_handlers
 from krispcall.common.locales import init_translation
-from krispcall.common.log_config import configure_logging
+from krispcall.common.configs.log_config import configure_logging
 
 
 from salesapi import settings
@@ -31,7 +31,6 @@ def new_app(settings_) -> Starlette:
     loggers, handlers = settings.get_loggers_config(settings_)
     configure_logging(settings_, handlers=handlers, loggers=loggers)
     db = init_database(settings_)
-    # broadcast = bootstrap.init_broadcaster(settings_)
     _middlewares = load_middlewares(settings_)
     translator = init_translation()
     twilio = bootstrap.init_twillo(settings_)
@@ -43,19 +42,16 @@ def new_app(settings_) -> Starlette:
         exception_handlers=load_exception_handlers(),
         on_startup=[
             db.connect,
-            # broadcast.connect,
             queue.connect,
         ],
         on_shutdown=[
             db.disconnect,
-            #  broadcast.disconnect
         ],
     )
 
     app.state.settings = settings_
     app.state.db = db
     app.state.twilio = twilio
-    # app.state.broadcast = broadcast
     app.state.translator = translator
     app.state.queue = queue
     return app

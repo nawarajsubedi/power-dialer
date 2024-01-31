@@ -3,7 +3,7 @@ from graphql import GraphQLError
 from ariadne import format_error
 from loguru import logger
 
-from krispcall.common.responses.responses import create_error_response
+from krispcall.common.error_handler.parse_error_response import create_error_response
 from krispcall.common.services.status import HTTP_400_INVALID_INPUT
 
 

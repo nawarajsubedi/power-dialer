@@ -7,15 +7,9 @@ from krispcall.common.services import status as HTTP_STATUS_CODE
 from starlette.authentication import has_required_scope
 from typing import Any, Callable, List
 from krispcall.auth.enums import AuthFeatureEnum
-from krispcall.common.responses.responses import create_error_response
+from krispcall.common.error_handler.parse_error_response import create_error_response
 from krispcall.common.error_handler.translator import get_translator
 from krispcall.providers.foundation_provider import get_workspace_feature
-
-
-# from krispcall.bulksms.service_layer import views
-# from krispcall.common.service_layer import status
-# from krispcall.common.service_layer.abstracts import create_error_response
-# from krispcall.common.service_layer.static_helpers import get_translator
 
 
 def requires_power_dialer_enabled(func: Callable):

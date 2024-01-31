@@ -19,13 +19,15 @@ from krispcall.campaigns.service_layer.exceptions import CampaignAlreadyEnded, C
 from krispcall.common.bootstrap import JobQueue
 from krispcall.common.services.file_storage.csv_file_helper import process_contacts_csv
 from krispcall.common.error_handler.exceptions import CSVProcessingError
-from krispcall.common.responses.responses import create_error_response
+from krispcall.common.error_handler.parse_error_response import create_error_response
+from krispcall.common.services.file_storage.file_services import upload_file_to_s3
 
 from krispcall.common.utils.shortid import ShortId
 from krispcall.common.error_handler.translator import get_translator
+from krispcall.konference.service_layer.exceptions import ContactNotFoundException
 from krispcall.twilio.utils import TwilioClient
 from krispcall.common.database.connection import DbConnection
-from krispcall.common.app_settings.request_helpers import get_database
+from krispcall.common.configs.request_helpers import get_database
 
 
 from krispcall.common.services import status as status
@@ -919,10 +921,10 @@ async def resolve_control_campaign(
             message=status.HTTP_400_INVALID_INPUT[2],
             error_status=status.HTTP_400_INVALID_INPUT,
         )
-    except (CampaignAlreadyEnded, CampaignAlreadyPaused):
+    except (CampaignAlreadyEnded, CampaignAlreadyPaused, ContactNotFoundException) as e:
         return create_error_response(
             translator=get_translator(request),
-            message=status.HTTP_400_INVALID_INPUT[2],
+            message=e,
             error_status=status.HTTP_400_INVALID_INPUT,
         )
     except Exception as error:

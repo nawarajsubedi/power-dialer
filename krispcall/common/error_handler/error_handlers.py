@@ -14,8 +14,8 @@ from loguru import logger
 import sys
 import traceback
 import json
-from krispcall.common.responses.response_model import ResponseModel
-from krispcall.common.responses.responses import create_error_response
+from krispcall.common.models.response_model import ResponseModel
+from krispcall.common.error_handler.parse_error_response import create_error_response
 
 from krispcall.common.utils.constant import MIMETYPE_JSON
 

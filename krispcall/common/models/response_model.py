@@ -1,32 +1,17 @@
 """ Schema for common views"""
 from __future__ import annotations
-from ast import Tuple
 import typing
 from typing import Any, Union, List, Dict
-from uuid import UUID
 from datetime import datetime
-from loguru import logger
 from pydantic import ValidationError, validator
 from pydantic import BaseModel, Field, root_validator
 from pydantic.generics import GenericModel
+from krispcall.common.models.resource_models import ResourceModel
 from krispcall.common.services.pagination.query import QueryModel
 
-# from krispcall.common.services.model import MetaLink
-
-# from krispcall.common.services.abstracts import MetaLink
 from krispcall.common.services.status import (
     HTTP_200_OK,
-    HTTP_500_INTERNAL_SERVER_ERROR,
 )
-
-# from krispcall.common.with_response import ResourceModel
-# from krispcall.common.with_response import DataModel, ResourceModel, with_response
-# from krispcall.common.services.abstracts import (
-#     DataModel,
-#     ResourceModel,
-#     QueryModel,
-#     with_response,
-# )
 
 DataT = typing.TypeVar("DataT")
 MetaT = typing.TypeVar("MetaT")
@@ -49,6 +34,10 @@ MetaT = typing.TypeVar("MetaT")
 DataDict = typing.Dict[str, typing.Any]
 ErrorsList = typing.List[DataDict]
 
+class Error(BaseModel):
+    code: int
+    message: str
+    error_key: str
 
 class MetaLink(BaseModel):
     self: typing.Optional[str]
@@ -56,12 +45,6 @@ class MetaLink(BaseModel):
     next: typing.Optional[str]
     first: typing.Optional[str]
     last: typing.Optional[str]
-
-
-class Error(BaseModel):
-    code: int
-    message: str
-    error_key: str
 
 
 class MultipleError(BaseModel):
@@ -85,22 +68,6 @@ class MetaModel(BaseModel):
     selected: typing.Optional[int]
 
 
-class ResourceModel(BaseModel):
-    """base model for result resource"""
-
-    class Config:
-        use_enum_values = True
-
-
-class DataModel(BaseModel):
-    """base model for form data"""
-
-    class Config:
-        allow_mutation = False
-        arbitrary_types_allowed = True
-        extra = "ignore"
-
-
 class ResponseModel(GenericModel, typing.Generic[DataT]):
     """generic object response model"""
 
@@ -121,13 +88,8 @@ class ResponseModel(GenericModel, typing.Generic[DataT]):
         return val
 
 
-class ErrorResponseModel(GenericModel):
-    status: int
-    error: Error
-
-
 class SuccessResponseModel(GenericModel):
-    data: Union[List[typing.Any], Dict[str, typing.Any]] = None 
+    data: Union[List[typing.Any], Dict[str, typing.Any]] = None
     error: Error = None
     status: int
 
@@ -210,77 +172,6 @@ class PaginationParams(QueryModel):
             raise ValueError("Invalid paging params")
 
 
-class Country(DataModel):
-    uid: UUID
-    name: str
-    short_name: str
-    alpha_two_code: str
-    dialing_code: str
-    flag_url: str
-    timezone: str
-
-
-class AreaCode(DataModel):
-    country: str
-    alphaTwoCode: str
-    dialCode: str
-    code: int
-    stateCenter: str
-    dialingCode: str
-    flagUrl: str
-
-
-class TimeZone(DataModel):
-    value: str
-    abbr: str
-    offset: float
-    isdst: str
-    text: str
-    utc: typing.List[str]
-
-
-class NumberResource(ResourceModel):
-    type: str
-    dialing_number: str
-    capabilities: typing.Dict[str, bool]
-    address_requirements: str
-    region: str
-    locality: str
-    country_iso: str
-
-
-# @with_response(PaginatedResource) # type: ignore
-# def create_paginated_response(response_model, *, resource: PaginatedResource):
-#     return response_model(data=resource, meta=None, status=200)
-
-
-# def create_error_response(
-#     *, message: Union[str, Tuple[str, any]], error_status: ErrorKeyTuple, translator=None # type: ignore
-# ) -> ErrorDict:
-#     if translator:
-#         message_str = ""
-#         message = translator(message)
-#     # Checks status code is 500 if yes return generic internal server error message
-#     # else return message pass by calling method
-#     if error_status[0] == HTTP_500_INTERNAL_SERVER_ERROR[0]:
-#         logger.error(message)
-#         message = HTTP_500_INTERNAL_SERVER_ERROR[2]
-
-#     if isinstance(message, str):
-#         message_str = message
-#     elif isinstance(message, object):
-#         message_str = extract_error_message(message)
-
-#     return ErrorResponseModel(
-#         status=error_status[0],
-#         error=Error(
-#             message=message_str, # type: ignore
-#             code=error_status[0],
-#             error_key=error_status[1],
-#         ),
-#     ).dict()
-
-
 def extract_error_message(message: Union[str, Any]) -> str:
     if isinstance(message, str):
         return message
@@ -322,51 +213,6 @@ def create_success_response(
     return SuccessResponseModel(data=data, error=error, status=status)
 
 
-def construct_countries(country_list) -> typing.List[Country]:
-    return [
-        Country.construct(
-            uid=country["uid"],
-            name=country["name"],
-            short_name=country["short_name"],
-            alpha_two_code=country["alpha2_code"],
-            dialing_code=country["dialing_code"],
-            flag_url=country["flag_url"],
-            timezone=country["timezone"],
-        )
-        for country in country_list
-    ]
-
-
-def construct_area_codes(area_code_list) -> typing.List[AreaCode]:
-    return [
-        AreaCode.construct(
-            dial_code=area_code["dialCode"],
-            alpha_two_code=area_code["alphaTwoCode"],
-            country=area_code["country"],
-            state=area_code["state"],
-            code=area_code["code"],
-            state_center=area_code["stateCenter"],
-            dialing_code=area_code["dialingCode"],
-            flag_url=area_code["flagUrl"],
-        )
-        for area_code in area_code_list
-    ]
-
-
-def construct_timezones(timezones) -> typing.List[TimeZone]:
-    return [
-        TimeZone.construct(
-            value=timezone["value"],
-            abbr=timezone["abbr"],
-            offset=timezone["offset"],
-            isdst=timezone["isdst"],
-            text=timezone["text"],
-            utc=timezone["utc"],
-        )
-        for timezone in timezones
-    ]
-
-
 class OffsetPageInfo(BaseModel):
     offset: int
     limit: int
@@ -390,10 +236,3 @@ class OffsetPaginationParams(QueryModel):
 class OffsetPaginatedResource(ResourceModel):
     page_info: OffsetPageInfo
     edges: typing.List[TestEdges]
-
-
-# @with_response(OffsetPaginatedResource)
-# def create_offsetpaginated_response(
-#     response_model, *, resource: OffsetPaginatedResource
-# ):
-#     return response_model(data=resource, meta=None, status=200)

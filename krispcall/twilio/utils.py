@@ -1,12 +1,12 @@
 import copy
 import json
 from uuid import UUID
+
+from redis import Redis
+
 from krispcall.common.utils.shortid import ShortId
 from krispcall.common.error_handler.exceptions import CPaaSAuthenticationException
 from krispcall.twilio.models import ConferenceResource, AccountCredential
-
-from redis import Redis
-# from krispcall.twilio.utils import sub_client
 from krispcall.twilio.twilio_client import TwilioClient
 
 

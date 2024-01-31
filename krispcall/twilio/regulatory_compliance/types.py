@@ -2,8 +2,6 @@ from typing import Dict, Optional
 from pydantic import EmailStr
 
 from krispcall.common.with_response import DataModel, ResourceModel
-# from krispcall.web.jsonapi.abstracts import DataModel
-
 
 class BundleInput(DataModel):
     friendly_name: str

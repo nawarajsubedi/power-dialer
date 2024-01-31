@@ -11,6 +11,7 @@ from krispcall.konference.adapters.protobufs import (
     outbound_call_pb2_grpc,
 )
 from krispcall.common.utils.shortid import ShortId
+from krispcall.providers.rpcaddress import get_billing_rpc_address, get_foundation_rpc_address
 
 
 BILLING_RPC_LOCAL_ADDRESS = "[::]:8005"
@@ -154,23 +155,3 @@ async def call_charge_transaction(data: CampaignOutboundCallRequest):
         return response
     except Exception as e:
         print("Exception on grpc", e)
-
-
-def get_billing_rpc_address():
-    is_local_env = True if os.getenv("app_env") == "development" else False
-    address = (
-        BILLING_RPC_LOCAL_ADDRESS
-        if is_local_env
-        else BILLING_RPC_REMOTE_ADDRESS
-    )
-    return address
-
-
-def get_foundation_rpc_address():
-    is_local_env = True if os.getenv("app_env") == "development" else False
-    address = (
-        FOUNDATION_RPC_LOCAL_ADDRESS
-        if is_local_env
-        else FOUNDATION_RPC_REMOTE_ADDRESS
-    )
-    return address

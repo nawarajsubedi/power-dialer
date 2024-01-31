@@ -1,6 +1,6 @@
 import typing
 from uuid import UUID
-from krispcall.common.responses.response_model import PaginationParams
+from krispcall.common.models.response_model import PaginationParams
 from krispcall.common.services.pagination.pagination import CursorPagination
 from krispcall.konference.domain import models
 from krispcall.konference.adapters import orm

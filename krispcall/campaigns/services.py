@@ -8,7 +8,7 @@ from krispcall.campaigns.service_layer.exceptions import (
     CampaignAlreadyPaused,
 )
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings.app_settings import Settings
+from krispcall.common.configs.app_settings import Settings
 from krispcall.konference.domain.models import CampaignConversation
 from loguru import logger
 from starlette.requests import Request
@@ -38,7 +38,7 @@ async def upload_campaign_contact_list(
     user: UUID,
     contact_data: Union[
         List[Dict], None
-    ],  # [{"Contact Name": "test", "Phone Number": "1234567890"}]
+    ],
     contact_list_name: str,
     contact_count: int,
     created_by_name: str,

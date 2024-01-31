@@ -2,38 +2,23 @@
 Wrapper around the Twilio Client for the methods we need.
 """
 
-from typing import Dict, List, Any, Union
-from krispcall.common.utils.shortid import ShortId
+from typing import Union
 from krispcall.twilio.caller_id_resource import CallerIdResource
-from krispcall.twilio.messaging_service_resource import (
-    MessagingServiceResource,
-)
 from krispcall.twilio.notify_resource import NotifyResource
 from krispcall.twilio.usage_triggers import UseLimitsResource
-from loguru import logger
 from pydantic import AnyHttpUrl
 from pydantic.tools import parse_obj_as
 from pydantic.types import SecretStr
 from krispcall.twilio.conference_resource import ConferenceResource
 from .type import (
-    AddNumberToConference,
-    NumberAvailabilityParams,
-    NumberAvailabilityPathParams,
-    Settings,
+    TwilioSettings,
 )
-from .address_resource import AddressResource
 from .transcription_resource import TranscriptionResource
 from .credential_resource import CredentialsResource
 from .call_resource import CallResource
-from .subaccount_resource import SubAccountResource
-from .sms_resource import SmsResource
-from .request_validator import RequestValidator
-from .phone_number_resource import PhoneNumberResource
-from .incoming_phone_number_resource import IncomingNumberResource
 from .application_resource import ApplicationResource
 from .recording_resource import RecordingsResource
 from .event_streams_resource import EventStreamsResource
-from .event_subscription_resource import EventSubscriptionResource
 
 from .regulatory_compliance import (
     BundlesResource,
@@ -43,7 +28,7 @@ from .regulatory_compliance import (
 
 
 class TwilioClient:
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: TwilioSettings):
         self.account_sid = settings.twilio_account_sid
         self.auth_token = settings.twilio_auth_token
         self.app_uri: AnyHttpUrl = settings.app_uri
@@ -68,35 +53,7 @@ class TwilioClient:
         self.ring_url = settings.ring_url
         self.hold_url = settings.hold_url
 
-    @property
-    def sms_resource(self) -> SmsResource:
-        return SmsResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            app_url=self.app_uri,
-            base_url=self.base_url,
-        )
 
-    @property
-    def sub_account_resource(self) -> SubAccountResource:
-        logger.info(
-            f"from sub account resource {self.account_sid} {self.auth_token}"
-        )
-        return SubAccountResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            base_url=self.base_url,
-        )
-
-    @property
-    def phone_number_resource(self) -> PhoneNumberResource:
-        return PhoneNumberResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            base_url=self.base_url,
-            twilio_edge=self.twilio_edge,
-            twilio_region=self.twilio_region,
-        )
 
     @property
     def call_resource(self) -> CallResource:
@@ -115,14 +72,6 @@ class TwilioClient:
         )
 
     @property
-    def incoming_number_resource(self) -> IncomingNumberResource:
-        return IncomingNumberResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            app_url=self.app_uri,
-        )
-
-    @property
     def application_resource(self) -> ApplicationResource:
         return ApplicationResource(
             account_sid=self.account_sid,
@@ -131,13 +80,6 @@ class TwilioClient:
             app_url=self.app_uri,
         )
 
-    @property
-    def address_resource(self) -> AddressResource:
-        return AddressResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            base_url=self.base_url,
-        )
 
     @property
     def recordings_resource(self) -> RecordingsResource:
@@ -189,15 +131,6 @@ class TwilioClient:
             app_url=self.app_uri,
         )
 
-    @property
-    def messaging_service_resource(self) -> MessagingServiceResource:
-        return MessagingServiceResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            app_url=self.app_uri,
-            twilio_edge=self.twilio_edge,
-            twilio_region=self.twilio_region,
-        )
 
     @property
     def notify_resource(self) -> NotifyResource:
@@ -240,15 +173,6 @@ class TwilioClient:
     @property
     def event_streams_resource(self):
         return EventStreamsResource(
-            account_sid=self.account_sid,
-            auth_token=self.auth_token,
-            base_url=self.base_url,
-            app_url=self.app_uri,
-        )
-
-    @property
-    def event_subscription_resource(self):
-        return EventSubscriptionResource(
             account_sid=self.account_sid,
             auth_token=self.auth_token,
             base_url=self.base_url,

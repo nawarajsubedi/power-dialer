@@ -4,7 +4,7 @@ advanced query builder for filters and sorting
 
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Union, Literal
-from krispcall.common.responses.response_model import (
+from krispcall.common.models.response_model import (
     PaginationParams,
     SearchType,
     OffsetPaginationParams,

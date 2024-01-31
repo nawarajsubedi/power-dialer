@@ -7,7 +7,6 @@ import typing
 from uuid import UUID
 from multidict import MultiDict
 from pydantic import BaseModel, BaseSettings, AnyHttpUrl
-import pydantic
 from pydantic.class_validators import validator
 from pydantic.networks import HttpUrl
 from typing import Union
@@ -28,7 +27,7 @@ SID = typing.NewType("SID", str)
 
 
 
-class Settings(BaseSettings):
+class TwilioSettings(BaseSettings):
     twilio_account_sid: SecretStr
     twilio_auth_token: SecretStr
     app_uri: AnyHttpUrl

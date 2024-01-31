@@ -5,7 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from krispcall.common.app_settings.app_settings import WebSettings
+from krispcall.common.configs.app_settings import WebSettings
 from krispcall.common.error_handler.error_handlers import on_authentication_error
 from krispcall.common.middlewares.middleware import JWTAuthenticationBackend, ResponseMiddleware
 

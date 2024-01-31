@@ -1,7 +1,8 @@
 import copy
 import json
 import typing
-from krispcall.common.utils.static_helpers import url_safe_encode
+from krispcall.common.error_handler.exceptions import InsufficientBalanceException
+from krispcall.common.utils.helpers import url_safe_encode
 from krispcall.konference.billing.constant import CHARGE_START_CALL_TIME
 from redis import Redis
 from uuid import UUID, uuid4
@@ -19,15 +20,14 @@ from krispcall.twilio.errorHelper import handle_call_failed
 from krispcall.twilio.eventHandler import TwilioEventHandler
 from krispcall.common.database.connection import DbConnection
 from krispcall.providers.queue_service.job_queue import JobQueue
-from krispcall.common.app_settings.app_settings import Settings
+from krispcall.common.configs.app_settings import Settings
 from krispcall.konference.service_layer.abstracts import (
     TwilioPSTNCallback,
     TwilioAgentCallback,
 )
 
-from krispcall.twilio.utils import sub_client
+from krispcall.twilio.utils import build_twilio_subaccount_client, sub_client
 from krispcall.konference.adapters.provider import (
-    get_plan_subscription,
     get_provider_details,
 )
 from krispcall.konference.service_layer import abstracts
@@ -36,13 +36,10 @@ from krispcall.konference.domain import models
 from krispcall.konference.service_layer import commands, views
 from krispcall.konference.service_layer import handlers
 
-from krispcall.campaigns.service_layer import views as campaign_views
-from krispcall.campaigns import services as camp_services
 from krispcall.konference.service_layer.event_handlers import call_handlers
 from krispcall.campaigns.domain import models as campaign_models
 from krispcall.twilio.twilio_client import TwilioClient
 from krispcall.konference.billing.enums import (
-    BillingTypeEnum,
     ConferencParticipantEnum,
 )
 from redis import Redis
@@ -126,8 +123,8 @@ async def update_campaign_conversation_status_with_reason(
     status: models.ConferenceStatus,
     conversation_id: UUID,
     db_conn: DbConnection,
-    reason_code: int = None, # type: ignore
-    reason_message: str = None, # type: ignore
+    reason_code: int = None,  # type: ignore
+    reason_message: str = None,  # type: ignore
 ):
     cmd = commands.UpdateCampaignConversationStatusCommand(
         id=conversation_id,
@@ -139,29 +136,21 @@ async def update_campaign_conversation_status_with_reason(
         campaign_conversation = await uow.repository.get(
             conversation_id=conversation_id
         )
-        campaign_conversation = (
-            handlers.update_conversation_status_with_reason(
-                cmd, campaign_conversation
-            )
+        campaign_conversation = handlers.update_conversation_status_with_reason(
+            cmd, campaign_conversation
         )
         await uow.repository.update_conversation_status_with_reason(
             campaign_conversation
         )
 
-    cmd = commands.UpdateCampaignParticipantCommand(
-        id=conversation_id, status=status
-    )
+    cmd = commands.UpdateCampaignParticipantCommand(id=conversation_id, status=status)
 
     async with unit_of_work.ParticipantCallSqlUnitOfWork(db_conn) as uow:
-        campaign_participant = await uow.repository.get(
-            conversation_id=conversation_id
-        )
+        campaign_participant = await uow.repository.get(conversation_id=conversation_id)
         campaign_participant = handlers.update_campaign_participant_status(
             cmd, campaign_participant
         )
-        await uow.repository.update_call_status(
-            campaign_participant, conversation_id
-        )
+        await uow.repository.update_call_status(campaign_participant, conversation_id)
         return campaign_participant
 
 
@@ -228,29 +217,23 @@ async def handle_conference_event(
         # Start charging to customer after participant join and sequence number 1
         if int(validated_data.sequence_number) == 1:
             db_conn: DbConnection = request.app.state.db
-            queue: JobQueue = (
-                request.app.state.queue
-            )  # JobQueue(redis_settings=request.app.state.settings.redis_settings)
+            queue: JobQueue = request.app.state.queue
             twilio_client: TwilioClient = request.app.state.twilio
 
             campaign_call_params = CampaignOutboundCallRequest(
-                workspace_id=workspace,# type: ignore
+                workspace_id=workspace,
                 call_sid=validated_data.call_sid,
                 child_call_sid=validated_data.call_sid,
                 parent_call_sid=validated_data.call_sid,
                 conference_sid=validated_data.conference_sid,
-                from_=camp_obj.get("dialing_number"),# type: ignore
-                to=camp_obj.get("conversation_data")[0]["contact_number"],# type: ignore
-                campaign_id=campaign_id,# type: ignore
-                conversation_id=camp_obj.get("conversation_data")[0]["id_"],# type: ignore
-                conference_friendly_name=conference_friendly_name,# type: ignore
+                from_=camp_obj.get("dialing_number"),
+                to=camp_obj.get("conversation_data")[0]["contact_number"],
+                campaign_id=campaign_id,
+                conversation_id=ShortId(camp_obj.get("conversation_data")[0]["id_"]).uuid(),
+                conference_friendly_name=conference_friendly_name,
                 remarks="",
                 total_participants=ConferencParticipantEnum.DEFAULT_TOTAL_PARTICIPANTS,
-                # Each call should be charged sip and conference charge amount
-                billing_types=[
-                    BillingTypeEnum.SIP_CHARGE,
-                    BillingTypeEnum.CONFERENCE_CHARGE,
-                ],
+                billing_types=[],
             )
 
             billing_response = await process_billing_transaction(
@@ -258,23 +241,29 @@ async def handle_conference_event(
                 cache,
                 queue,
                 twilio_client,
-                charge_call_back_time=CHARGE_START_CALL_TIME,  
+                charge_call_back_time=CHARGE_START_CALL_TIME,
+                charge_for_first_minute=True
                 # For the first time charge job schedule should run after CHARGE_START_CALL_TIME-50 time
                 # And then it should run every minutes after 55 CHARGE_CALL_BACK_TIME time
             )
 
             if (
-                billing_response.is_sufficient_credit
+                not billing_response.is_sufficient_credit
                 or not billing_response.is_call_inprogress
             ):
-                print(
-                    "Ending call due to insufficient credit/call is not inprogress"
+                twilio_client = build_twilio_subaccount_client(
+                    cache=cache, twilio_client=twilio_client, campaign_id=campaign_id
                 )
+                await twilio_client.conference_resource.terminate_by_id(
+                    validated_data.conference_sid,
+                )
+
                 await update_campaign_conversation_status(
                     status=models.ConferenceStatus.completed,
                     conversation_id=conversation,
                     db_conn=db_conn,
                 )
+                raise InsufficientBalanceException()
 
         await handle_participant_join(
             validated_data=validated_data,
@@ -302,8 +291,7 @@ async def handle_conference_event(
             camp_obj=camp_obj,
         )
     elif (
-        validated_data.status_callback_event
-        == abstracts.ConferenceEvent.conference_end
+        validated_data.status_callback_event == abstracts.ConferenceEvent.conference_end
     ):
         await request.app.state.queue.enqueue_job(
             "handle_campaign_conversation_end",
@@ -337,7 +325,7 @@ async def handle_participant_leave(
     participant_call_resource = cache.get(validated_data.call_sid)
     if not participant_call_resource:
         raise Exception("Participant call not found in cache!")
-    participant_call_resource = json.loads(participant_call_resource) # type: ignore
+    participant_call_resource = json.loads(participant_call_resource)  # type: ignore
     # participant_call_resource = await views.get_participant_call_by_twi_sid(
     #     validated_data.call_sid,
     #     request.app.state.db,
@@ -434,8 +422,7 @@ async def handle_participant_leave(
         (
             item
             for item in conversations
-            if item.get("sequence_number")
-            == dialing_contact.get("sequence_number") + 1
+            if item.get("sequence_number") == dialing_contact.get("sequence_number") + 1
         ),
         None,
     )
@@ -464,13 +451,13 @@ async def handle_participant_leave(
         contact_name=dialing_contact.get("contact_name"),
         recording_url=dialing_contact.get("recording_url"),
         recording_duration=dialing_contact.get("recording_duration"),
-        created_by=ShortId(camp_obj.get("assignee_id")).uuid(), # type: ignore
+        created_by=ShortId(camp_obj.get("assignee_id")).uuid(),  # type: ignore
     )
 
     queue_data: abstracts.QueueData = dict(
         workspace=workspace,
         dialing_number=camp_obj.get("dialing_number"),
-        dialing_number_id=ShortId(camp_obj.get("dialing_number_id")).uuid(),# type: ignore
+        dialing_number_id=ShortId(camp_obj.get("dialing_number_id")).uuid(),  # type: ignore
         cool_off_period_enabled=camp_obj.get("cooloff_period_enabled"),
         cool_off_period=camp_obj.get("cool_off_period"),
         next_number_to_dial=None
@@ -479,10 +466,10 @@ async def handle_participant_leave(
         next_conversation_id=None
         if not next_contact
         else ShortId(next_contact.get("id_")).uuid(),
-        member=ShortId(camp_obj.get("assignee_id")).uuid(),# type: ignore
+        member=ShortId(camp_obj.get("assignee_id")).uuid(),  # type: ignore
         call_script_id=None
         if not camp_obj.get("call_script_id")
-        else ShortId(camp_obj.get("call_script_id")).uuid(), # type: ignore
+        else ShortId(camp_obj.get("call_script_id")).uuid(),  # type: ignore
         campaign_id=campaign_id,
         is_reattempt=is_reattempt,
         recording_enabled=camp_obj.get("recording_enabled", False),
@@ -559,8 +546,7 @@ async def handle_participant_join(
     next_to_dial = (
         item
         for item in conversations
-        if item["sequence_number"]
-        == campaign_conversation.get("sequence_number") + 1
+        if item["sequence_number"] == campaign_conversation.get("sequence_number") + 1
     )
     next_to_dial = next(next_to_dial, None)
     if next_to_dial:
@@ -589,7 +575,7 @@ async def handle_participant_join(
         )
         raise Exception("Participant call not found saved in cache!")
 
-    participant_call_resource = json.loads(participant_call_resource) # type: ignore
+    participant_call_resource = json.loads(participant_call_resource)  # type: ignore
 
     if (
         participant_call_resource.get("participant_type")
@@ -615,28 +601,26 @@ async def handle_participant_join(
             )
         )
 
-        if not "call_sid" in customer_call or not customer_call.get(
-            "call_sid"
-        ):
+        if not "call_sid" in customer_call or not customer_call.get("call_sid"):
             reason_code = customer_call.get("reason_code")
-            reason_message = handle_call_failed(int(reason_code)) # type: ignore
+            reason_message = handle_call_failed(int(reason_code))  # type: ignore
 
             await send_event_to_client(
                 call_sid=validated_data.call_sid,
                 campaign_id=campaign_id,  # type: ignore
-                conversation_id=conversation_id, # type: ignore
+                conversation_id=conversation_id,  # type: ignore
                 cache=cache,
                 db_conn=db_conn,
                 twilio_client=request.app.state.twilio,
-                message=reason_message, # type: ignore
+                message=reason_message,  # type: ignore
             )
 
             await update_campaign_conversation_status_with_reason(
-                status=models.TwilioCallStatus.failed, # type: ignore
+                status=models.TwilioCallStatus.failed,  # type: ignore
                 conversation_id=conversation_id,
                 db_conn=db_conn,
-                reason_code=reason_code, # type: ignore
-                reason_message=reason_message, # type: ignore
+                reason_code=reason_code,  # type: ignore
+                reason_message=reason_message,  # type: ignore
             )
             await sub_client_.conference_resource.terminate_by_name(
                 ShortId.with_uuid(conversation_sid),
@@ -648,9 +632,7 @@ async def handle_participant_join(
                 "client": customer_call.get("call_sid"),
                 "client_status": "initiated",
             }
-            cache.set(
-                campaign_conversation.get("id_"), json.dumps(conversation_obj)
-            )
+            cache.set(campaign_conversation.get("id_"), json.dumps(conversation_obj))
             data = abstracts.AddParticipantCallMsg(
                 id_=ShortId.with_uuid(uuid4()),
                 twi_sid=customer_call.get("call_sid"),
@@ -681,18 +663,18 @@ async def send_event_to_client(
     cache,
     db_conn,
 ):
-    values = cache.get(ShortId.with_uuid(campaign_id)) or {} # type: ignore
-    camp_obj = json.loads(values) # type: ignore
+    values = cache.get(ShortId.with_uuid(campaign_id)) or {}  # type: ignore
+    camp_obj = json.loads(values)  # type: ignore
     subaccount_credentials = camp_obj.get("cpass_user")
 
     participants = await views.get_conversation_participants(
-        conversation=conversation_id, db_conn=db_conn # type: ignore
+        conversation=conversation_id, db_conn=db_conn  # type: ignore
     )
 
     twilio_event_handler = TwilioEventHandler()
     await twilio_event_handler.send_event_to_client(
         call_sid=call_sid,
-        conversation_id=conversation_id, # type: ignore
+        conversation_id=conversation_id,  # type: ignore
         twilio_client=twilio_client,
         participants=participants,
         subaccount_credentials=subaccount_credentials,
@@ -703,9 +685,7 @@ async def send_event_to_client(
 async def fetch_provider_workspace_client(
     workspace: UUID, provider_client: TwilioClient
 ) -> TwilioClient:
-    details = await get_provider_details(
-        workspace_id=ShortId.with_uuid(workspace)
-    )
+    details = await get_provider_details(workspace_id=ShortId.with_uuid(workspace))
 
     # build a krispcall_twilio sub client
     #  # we build sub client because using client directly
@@ -735,9 +715,7 @@ async def skip_conversation(
         return conversation
 
 
-async def hold_conversation(
-    conversation_sid: UUID, hold: bool, db_conn: DbConnection
-):
+async def hold_conversation(conversation_sid: UUID, hold: bool, db_conn: DbConnection):
     if hold:
         return await update_campaign_conversation_status(
             status=models.ConferenceStatus.on_hold,
@@ -783,7 +761,7 @@ async def record_campaign_conversation(
     conference_sid = ShortId.with_uuid(campaign_conversation.get("twi_sid"))
 
     # get the correct action
-    action_func = record_action_map.get(action.lower, None) # type: ignore
+    action_func = record_action_map.get(action.lower, None)  # type: ignore
 
     if action_func:
         await action_func(conference_sid=conference_sid)
@@ -810,9 +788,7 @@ async def control_campaign_loop(
     settings: Settings,
     queue: JobQueue,
 ):
-    details = await get_provider_details(
-        workspace_id=ShortId.with_uuid(workspace)
-    )
+    details = await get_provider_details(workspace_id=ShortId.with_uuid(workspace))
 
     # build a krispcall_twilio sub client
     #  # we build sub client because using client directly
@@ -881,9 +857,7 @@ async def drop_campaign_voicemail(
         db_conn=db_conn,
     )
     client_call = [
-        record
-        for record in participants
-        if record.get("participant_type") == "client"
+        record for record in participants if record.get("participant_type") == "client"
     ]
     if not client_call:
         return
@@ -893,5 +867,4 @@ async def drop_campaign_voicemail(
         call_sid=call_sid,
         voicemail_url=voicemail_url,
     )
-    # print(response)
     return

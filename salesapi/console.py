@@ -8,7 +8,7 @@ from alembic import command  # type: ignore
 from alembic.config import Config
 
 from salesapi.alembic import constants  # type: ignore\
-from krispcall.common.app_settings.app_settings import resolve_component_module_location
+from krispcall.common.configs.app_settings import resolve_component_module_location
 
 class CliCommand:
     """Sales dialer cli command"""

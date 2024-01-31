@@ -10,22 +10,12 @@ from functools import lru_cache
 import logging
 from pydantic import PositiveInt
 
-from krispcall.common.app_settings.app_settings import CoreSettings, Settings, resolve_path_from_config
+from krispcall.common.configs.app_settings import CoreSettings, Settings, resolve_path_from_config
 from pydantic import (
-    BaseSettings,
-    DirectoryPath,
-    FilePath,
-    SecretStr,
     ValidationError,
-    PostgresDsn,
-)
-from pydantic.env_settings import (
-    EnvSettingsSource,
-    InitSettingsSource,
-    SecretsSettingsSource,
 )
 from yaml import safe_load
-from krispcall.common.log_config import LOG_BACKUP_FILES_COUNT, LOG_FILE_MAX_SIZE
+from krispcall.common.configs.log_config import LOG_BACKUP_FILES_COUNT, LOG_FILE_MAX_SIZE
 
 
 ENV_PREFIX = "KRISPCALL_"
@@ -76,7 +66,6 @@ class AppSettings(Settings):
     components: typing.List[str] = [
         "krispcall.campaigns",
         "krispcall.konference",
-        # "krispcall.bulksms",
     ]
 
     agent_jwt_audience: str = "com.timetracko.tracker"

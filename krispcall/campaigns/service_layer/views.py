@@ -7,7 +7,7 @@ from krispcall.campaigns.service_layer.abstracts import CampPaginationParams
 import sqlalchemy as sa
 from krispcall.common.database.connection import DbConnection
 from krispcall.campaigns.adapters import orm
-from krispcall.common.responses.response_model import PaginationParams
+from krispcall.common.models.response_model import PaginationParams
 # from krispcall.common.services.abstracts import PaginationParams
 from krispcall.common.services.pagination.pagination import CursorPagination
 

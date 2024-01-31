@@ -39,11 +39,11 @@ async def task_campaign_call_charge(
         if billing_response.is_sufficient_credit:
             await update_campaign_conversation_status(
                 status=models.ConferenceStatus.completed,
-                conversation_id=UUID(campaign_call_params.conversation_id),
+                conversation_id=campaign_call_params.conversation_id,
                 db_conn=db_conn,
             )
     except Exception as e:
-        print(e)
+        print("Error", e)
 
 
 async def process_billing_transaction(
@@ -52,6 +52,7 @@ async def process_billing_transaction(
     queue: JobQueue,
     twilio_client: TwilioClient,
     charge_call_back_time: int = CHARGE_CALL_BACK_TIME,
+    charge_for_first_minute: bool = False,
 ):
     is_call_inprogress = False
 
@@ -62,38 +63,45 @@ async def process_billing_transaction(
         campaign_id=campaign_call_params.campaign_id,
     )
 
-    lower_status = conference_info.conference_status.lower()
-    not_active_statuses = {status.value for status in NotActiveStatusEnum}
+    call_status = conference_info.conference_status.lower()
     active_statuses = {status.value for status in ActiveStatusEnum}
+    print("Call charge task------------------------------------------------>", call_status)
 
-    if (
-        lower_status in not_active_statuses
-        or not campaign_call_params.call_sid
-    ):
+    if call_status not in active_statuses and not charge_for_first_minute:
+        # Do not charge to customer
+        # So returning from the process_billing_transaction
+        return BillingResponse(is_call_inprogress=False)
+
+    if call_status in active_statuses or not campaign_call_params.call_sid:
         campaign_call_params.total_participants = 1
 
-    if lower_status in active_statuses:
-        campaign_call_params.billing_types.append(BillingTypeEnum.CALL_CHARGE)
+    billing_types = [
+        BillingTypeEnum.SIP_CHARGE,
+        BillingTypeEnum.CONFERENCE_CHARGE,
+    ]
+
+    if charge_for_first_minute or call_status in active_statuses:
+        billing_types.append(BillingTypeEnum.CALL_CHARGE)
+
+    campaign_call_params.billing_types = billing_types
+
+    if call_status in active_statuses:
         is_call_inprogress = True
         await queue.enqueue_job(
             "task_campaign_call_charge",
             data=[campaign_call_params],
             queue_name="arq:pd_queue",
-            defer_until=datetime.now()
-            + timedelta(seconds=charge_call_back_time),
+            defer_until=datetime.now() + timedelta(seconds=charge_call_back_time),
         )
 
     billing_response: BillingResponse = (
-        await BillingService.execute_campaign_call_transaction(
-            campaign_call_params
-        )
+        await BillingService.execute_campaign_call_transaction(data=campaign_call_params)
     )
     billing_response.is_call_inprogress = is_call_inprogress
 
     return billing_response
 
 
-# Todo reuse existing code but needs to change/adjust in konference.services to overcome circular dependency error
 async def update_campaign_conversation_status(
     status: models.ConferenceStatus,
     conversation_id: UUID,

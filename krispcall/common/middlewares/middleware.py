@@ -14,7 +14,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from krispcall.common.middlewares.user import create_authenticated_principal_user  # type: ignore
-from krispcall.common.app_settings.request_helpers import get_app_settings
+from krispcall.common.configs.request_helpers import get_app_settings
 from krispcall.common.error_handler.exceptions import (
     FailedIdentityException,
     TokenException,

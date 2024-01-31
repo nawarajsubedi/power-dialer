@@ -1,15 +1,17 @@
 # Handles the event for the conference
 import json
-from krispcall.common.services.helper import convert_dict_to_snake_case
-from krispcall.common.services.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
-from krispcall.common.utils.shortid import ShortId
-from krispcall.common.utils.static_helpers import url_safe_decode
-from krispcall.konference import services
 from redis import Redis
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import Response
 from starlette.requests import Request
+
+from krispcall.common.error_handler.exceptions import InsufficientBalanceException
+from krispcall.common.utils.shortid import ShortId
+from krispcall.common.utils.helpers import url_safe_decode
+from krispcall.common.services.helper import convert_dict_to_snake_case
+from krispcall.common.services.status import HTTP_200_OK, HTTP_400_INVALID, HTTP_500_INTERNAL_SERVER_ERROR
 from krispcall.konference.service_layer import abstracts
+from krispcall.konference import services
 
 
 class CampaignConferenceHandler(HTTPEndpoint):
@@ -43,10 +45,22 @@ class CampaignConferenceHandler(HTTPEndpoint):
                 camp_obj=camp_obj,
                 cache=cache,
             )
-            return Response(status_code=HTTP_200_OK.status_code, media_type="application/xml")
+            return Response(
+                status_code=HTTP_200_OK.status_code, media_type="application/xml"
+            )
+        except InsufficientBalanceException as e:
+            print("exception", str(e))
+            return Response(
+                status_code=HTTP_400_INVALID.status_code,
+                media_type="application/xml",
+            )
+
         except Exception as e:
             print("exception", str(e))
-            return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR.status_code, media_type="application/xml")
+            return Response(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR.status_code,
+                media_type="application/xml",
+            )
 
 
 class ConferenceRecordingHandler(HTTPEndpoint):
@@ -54,7 +68,7 @@ class ConferenceRecordingHandler(HTTPEndpoint):
 
     async def post(self, request: Request):
         try:
-             # parse data
+            # parse data
             data = await request.form()
             callback_data = request.path_params["callback_data"]
             decoded_data = url_safe_decode(callback_data).split(",")
@@ -95,7 +109,12 @@ class ConferenceRecordingHandler(HTTPEndpoint):
             #     camp_obj=camp_obj,
             #     cache=cache,
             # )
-            return Response(status_code=HTTP_200_OK.status_code, media_type="application/xml")
+            return Response(
+                status_code=HTTP_200_OK.status_code, media_type="application/xml"
+            )
         except Exception as e:
             print("exception", str(e))
-            return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR.status_code, media_type="application/xml")
+            return Response(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR.status_code,
+                media_type="application/xml",
+            )

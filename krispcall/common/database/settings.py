@@ -6,7 +6,7 @@ from typing import Protocol
 
 from pydantic import PostgresDsn
 
-from krispcall.common.app_settings.app_settings import CoreSettings
+from krispcall.common.configs.app_settings import CoreSettings
 
 # class DatabaseSettings(Protocol):
 #     """database settings protocol"""

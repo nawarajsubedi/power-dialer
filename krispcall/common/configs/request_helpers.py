@@ -1,6 +1,6 @@
 from starlette.requests import Request
 
-from krispcall.common.app_settings.app_settings import WebSettings
+from krispcall.common.configs.app_settings import WebSettings
 from krispcall.common.database.connection import DbConnection
 
 

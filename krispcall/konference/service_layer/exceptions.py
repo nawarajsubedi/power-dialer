@@ -16,3 +16,6 @@ class ConferenceNotFoundInTwilio(Exception):
 
 class ConferenceAlreadyCompleted(Exception):
     pass
+
+class ContactNotFoundException(Exception):
+    pass

@@ -302,25 +302,6 @@ class CallResource:
                 uri=url,
             )
 
-    # async def send_event_to_call(self, call_sid: str, msg: Dict):
-    #     url = (
-    #         f"https://api.twilio.com/2010-04-01/Accounts/"
-    #         f"{self.account_sid}/Calls/{call_sid}/UserDefinedMessages.json"
-    #     )
-    #     data = {
-    #         "Content": json.dumps(msg),
-    #     }
-    #     response = await self.client.post(url=url, payload=data)
-    #     if "sid" in response:
-    #         return response
-    #     else:
-    #         raise TwilioRestException(
-    #             msg=response["message"],
-    #             code=response["code"],
-    #             status=response["status"],
-    #             uri=url,
-    #         )
-
     async def get_call_details(self, call_sid: str):
         url = (
             f"https://api.twilio.com/2010-04-01/Accounts/"
@@ -451,69 +432,6 @@ class CallResource:
         logger.info(f"payload {payload}")
         redirect = await self.client.post(url=url, payload=payload)
         return redirect
-
-    # async def cold_transfer(
-    #     self,
-    #     call_sid: str,
-    #     destination,
-    #     caller_id,
-    #     direction,
-    #     workspace_sid,
-    #     channel_sid,
-    #     params,
-    # ):
-    #     url = (
-    #         f"https://api.twilio.com/2010-04-01/Accounts/"
-    #         f"{self.account_sid}/Calls/{call_sid}.json"
-    #     )
-    #     payload = {
-    #         "Twiml": await self.conference.dial_transfer(
-    #             destination=destination,
-    #             caller_id=caller_id,
-    #             direction=direction,
-    #             workspace_sid=workspace_sid,
-    #             channel_sid=channel_sid,
-    #             params=params,
-    #         )
-    #     }
-    #     transfer = await self.client.post(url=url, payload=payload)
-    #     return transfer
-
-    # # async def put_call_on_hold(
-    #     self,
-    #     call_sid,
-    #     workspace_sid,
-    #     identity,
-    #     direction,
-    #     conversation_sid,
-    # ):
-    #     response = VoiceResponse()
-    #     child_call = await self.get_call_details_from_parent_call_sid(
-    #         parent_call_sid=call_sid
-    #     )
-    #     url = (
-    #         f"{self.app_url}/twilio_callbacks/hold-url/outgoing/"
-    #         f"{workspace_sid}/{conversation_sid}"
-    #     )
-    #     if direction == "incoming":
-    #         url = (
-    #             f"{self.app_url}/twilio_callbacks/hold-url/incoming/"
-    #             f"{workspace_sid}/{conversation_sid}"
-    #         )
-
-    #     response.enqueue(wait_url=url, name=identity)
-
-    #     url = (
-    #         f"https://api.twilio.com/2010-04-01/Accounts/"
-    #         f"{self.account_sid}/Calls/{child_call[0].get('sid')}.json"
-    #     )
-    #     payload = {"Twiml": str(response)}
-
-    #     # Execute this twiml for the suspended agent
-
-    #     # now, place the callee on hold
-    #     callee_hold = await self.client.post(url=url, payload=payload)
-    #     return callee_hold
 
     async def remove_call_from_hold(
         self,

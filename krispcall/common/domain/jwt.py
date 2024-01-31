@@ -6,6 +6,7 @@ import typing
 from uuid import UUID
 
 from krispcall.common.domain.entities import BaseEntity
+from krispcall.common.auth_utils.jwt import Duration, utc_now
 
 
 class JWTClaim(BaseEntity):

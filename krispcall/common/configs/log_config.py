@@ -6,7 +6,7 @@ import logging
 import logging.config
 import typing
 from copy import deepcopy
-from krispcall.common.app_settings.app_settings import CoreSettings, resolve_path_from_config
+from krispcall.common.configs.app_settings import CoreSettings, resolve_path_from_config
 
 # logging
 ONE_MB_IN_BYTES: int = 10_00_000

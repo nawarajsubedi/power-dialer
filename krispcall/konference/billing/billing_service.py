@@ -24,6 +24,10 @@ class BillingService:
                 return BillingResponse(is_sufficient_credit=False, success=False)
 
             billing_response = await call_charge_transaction(data)
+            print(
+                "\n\n billing_response.payload.charge_amount----------------------------------------------------->",
+                billing_response.payload.charge_amount, "\n\n"
+            )
 
             return BillingResponse(
                 is_sufficient_credit=True,

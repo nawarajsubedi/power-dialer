@@ -12,7 +12,7 @@ from krispcall.common.services.pagination.query_builder import (
 )
 from sqlalchemy.sql.expression import select
 from sqlalchemy.sql.selectable import Selectable
-from krispcall.common.responses.response_model import (
+from krispcall.common.models.response_model import (
     OffsetPageInfo,
     PaginationParams,
     PageInfo,

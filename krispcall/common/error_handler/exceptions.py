@@ -144,20 +144,5 @@ class ColumnNotFound(Exception):
 class CSVProcessingError(Exception):
     pass
 
-# def decode_token(
-#     token: str, secret: str, algorithms: typing.List[str], audience: str
-# ) -> typing.Optional[typing.Dict]:
-#     """decode jwt token with secret"""
-#     payload = None
-#     try:
-#         payload = jwt.decode(
-#             token=token, key=secret, algorithms=algorithms, audience=audience
-#         )
-#     except jwt.ExpiredSignatureError as e:
-#         LOGGER.warning(e)
-#         raise TokenSignatureExpiredException("Token Signature Expired.")
-
-#     except jwt.JWTError as e:
-#         LOGGER.warning(e)
-#         raise InvalidTokenException()
-#     return payload
+class InsufficientBalanceException(Exception):
+    pass

@@ -16,12 +16,9 @@ async def startup(ctx):
     ctx["settings"] = settings
     ctx["db"] = init_database(ctx["settings"])
     ctx["twilio"] = bootstrap.init_twillo(ctx["settings"])
-    # ctx["broadcaster"] = bootstrap.init_broadcaster(ctx["settings"])
     ctx["queue"] = bootstrap.init_queue(ctx["settings"])
     await ctx["db"].connect()
     await ctx["queue"].connect()
-    # await ctx["broadcaster"].connect()
-
 
 async def shutdown(ctx):
     await ctx["db"].disconnect()

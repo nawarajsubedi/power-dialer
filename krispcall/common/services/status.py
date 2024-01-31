@@ -8,23 +8,23 @@ import typing
 
 class HTTPError(tuple):
     def __new__(
-        cls, code: int, error_name: str, status_message: Union[str, typing.Any] = None
+        cls, code: int, error_name: str, message: Union[str, typing.Any] = None
     ):
-        return super().__new__(cls, (code, error_name, status_message))
+        return super().__new__(cls, (code, error_name, message))
 
     def __init__(
-        self, code: int, error_name: str, status_message: Union[str, typing.Any] = None
+        self, code: int, error_name: str, message: Union[str, typing.Any] = None
     ):
         self.code = code
         self.error_name = error_name
-        self.status_message = status_message
+        self.message = message
 
     @property
     def status_code(self):
         return self.code
 
     @property
-    def message(self) -> str:
+    def status_message(self) -> str:
         return self.message
 
 
@@ -96,6 +96,12 @@ HTTP_404_PAYMENT_METHOD_NOT_AVAILABLE = HTTPError(
     404,
     "payment_method_not_available",
 )
+HTTP_404_CONTACT_LIST_NOT_FOUND = HTTPError(
+    404,
+    "contact_list_not_found",
+    "Contact list not found!"
+)
+
 HTTP_501_NOT_IMPLEMENTED = HTTPError(501, "not_implemented")
 
 # integration

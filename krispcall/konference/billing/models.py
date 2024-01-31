@@ -1,24 +1,32 @@
+from typing import List, Optional
 from dataclasses import dataclass
-from typing import List
 
 from krispcall.konference.billing.enums import BillingTypeEnum
+from krispcall.konference.domain.models import (
+    WorkspaceReference,
+    TwilioCallSid,
+    TwilioConferenceFriendlyName,
+    TwilioConferenceSid,
+    CampaignConversationReference,
+    TwilioConferenceSid,
+)
 
 
 @dataclass
 class CampaignOutboundCallRequest:
-    workspace_id: str
+    workspace_id: WorkspaceReference
     from_: str
     to: str
-    call_sid: str
-    child_call_sid: str
-    parent_call_sid: str
-    conference_sid: str
-    campaign_id: str
-    conference_friendly_name: str
-    conversation_id: str
+    call_sid: TwilioCallSid
+    child_call_sid: TwilioCallSid
+    parent_call_sid: TwilioCallSid
+    conference_sid: TwilioConferenceSid
+    campaign_id: CampaignConversationReference
+    conference_friendly_name: TwilioConferenceFriendlyName
+    conversation_id: CampaignConversationReference
     total_participants: int
-    billing_types: List[BillingTypeEnum]
     remarks: str
+    billing_types: Optional[List[BillingTypeEnum]]
 
 
 @dataclass

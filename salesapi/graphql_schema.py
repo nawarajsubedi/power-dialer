@@ -5,15 +5,16 @@ from ariadne.asgi import GraphQL
 from ariadne.load_schema import read_graphql_file
 
 from krispcall.campaigns.entrypoints.graphql import types as camp_types
-from krispcall.common.app_settings.app_settings import resolve_component_module_locations
-from krispcall.common.error_handler.graphql_error import default_graphql_badrequest_handler
+from krispcall.common.configs.app_settings import resolve_component_module_locations
+from krispcall.common.error_handler.graphql_error import (
+    default_graphql_badrequest_handler,
+)
 from krispcall.common.graphql import (
     cursor_scalar,
     datetime_scalar,
     filter_scalar,
     uid_scalar,
 )
-# from krispcall.bulksms.entrypoints.graphql import types as bulk_types
 
 GRAPHQL_FILES = [
     "types.graphql",
@@ -51,11 +52,8 @@ TYPE_DEFS = load_schema()
 schema = make_executable_schema(
     TYPE_DEFS,
     [
-        # subscription,
         camp_types.query,
         camp_types.mutation,
-        # bulk_types.query,
-        # bulk_types.mutation,
         datetime_scalar,
         uid_scalar,
         cursor_scalar,

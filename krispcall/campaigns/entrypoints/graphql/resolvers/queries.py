@@ -7,11 +7,11 @@ from krispcall.auth.requires_auth_power_dialer import (
 )
 from ariadne import convert_kwargs_to_snake_case
 from graphql.type.definition import GraphQLResolveInfo
-from krispcall.common.responses.response_model import PaginationParams
-from krispcall.common.responses.responses import create_error_response
+from krispcall.common.models.response_model import PaginationParams
+from krispcall.common.error_handler.parse_error_response import create_error_response
 
 from krispcall.common.utils.shortid import ShortId
-from krispcall.common.app_settings.request_helpers import get_database
+from krispcall.common.configs.request_helpers import get_database
 
 
 from krispcall.common.services import status as status
@@ -131,12 +131,12 @@ async def resolve_callScript_by_campaign_id(
         callScript = await views.get_callScript_by_id(
             workspace_id,
             db_conn,
-            call_script_id,
+            ShortId(call_script_id).uuid(),
         )
         return abstracts.get_callScript_by_id(record=callScript)
     except Exception as e:
         return create_error_response(
-            message=str(e), error_status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            message=e, error_status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 

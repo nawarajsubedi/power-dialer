@@ -1,8 +1,8 @@
 import copy
 import json
-from krispcall.common.utils.static_helpers import url_safe_decode
+from krispcall.common.utils.helpers import url_safe_decode
 from krispcall.konference.domain.models import ConferenceStatus
-from krispcall.common.app_settings.request_helpers import get_database
+from krispcall.common.configs.request_helpers import get_database
 from redis import Redis
 from starlette.endpoints import HTTPEndpoint
 from starlette.requests import Request
